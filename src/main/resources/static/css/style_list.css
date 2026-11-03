@@ -1,0 +1,161 @@
+/* Styles spécifiques à la page de liste */
+
+.table-container {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.table-header h1 {
+    font-size: 24px;
+    color: var(--dark);
+}
+
+.btn-add {
+    background: var(--primary);
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s;
+}
+
+.btn-add:hover {
+    background: #1e40af;
+}
+
+.btn-add::before {
+    content: "+";
+    font-size: 20px;
+    font-weight: 700;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: var(--secondary);
+    color: white;
+}
+
+thead th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--gray);
+    transition: background 0.2s;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+tbody td {
+    padding: 15px;
+    font-size: 14px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.empty-state p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.empty-state .btn-add {
+    display: inline-flex;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.product-id {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.price-tag {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+/* Message de confirmation */
+.alert-success {
+    background: #D1FAE5;
+    color: #065F46;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .table-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .table-header h1 {
+        text-align: center;
+    }
+
+    .btn-add {
+        justify-content: center;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    thead th,
+    tbody td {
+        padding: 10px 8px;
+    }
+}

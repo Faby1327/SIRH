@@ -1,0 +1,111 @@
+/*
+  Blocs de décision des pages Détail, communs à la RH, à la Finance et au Directeur :
+  boutons d'action, panneau « Motif du refus » et décision déjà prise (lecture seule).
+  Même principe que les autres fichiers : classe racine c-detail à la place des <style scoped> de Vue.
+*/
+
+/* ----- Boutons d'action ----- */
+.c-detail .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 8px;
+}
+.c-detail .note { flex: 1 1 260px; font-size: 14px; color: var(--c-muted); }
+.c-detail .boutons { display: flex; flex-wrap: wrap; gap: 12px; }
+/* Dans le Vue, le bouton « Valider » était directement dans .boutons ; ici il est dans un <form> qui ne compte pas dans la mise en page */
+.c-detail .boutons form { display: contents; }
+.c-detail .refuser,
+.c-detail .valider,
+.c-detail .approuver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.c-detail .refuser { border: 1px solid var(--c-danger); background: var(--c-surface); color: var(--c-danger); }
+.c-detail .valider,
+.c-detail .approuver { border: none; background: var(--c-accent); color: #fff; }
+.c-detail .valider:disabled { background: var(--c-btn-disabled-bg); color: var(--c-btn-disabled-fg); cursor: not-allowed; }
+
+/* ----- Panneau de refus ----- */
+.c-detail .refus {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--c-ko-line);
+  background: var(--c-ko-soft);
+}
+.c-detail .refus-label { font-size: 15px; font-weight: 600; color: var(--chip-red-fg); }
+.c-detail .refus-aide { margin: 0; font-size: 14px; color: var(--c-ink-2); }
+.c-detail .refus-champ {
+  width: 100%;
+  min-height: 112px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-field);
+  border-radius: var(--r-ctl);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.c-detail .refus-erreur { margin: 0; font-size: 14px; font-weight: 500; color: var(--chip-red-fg); }
+.c-detail .refus-boutons { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.c-detail .annuler,
+.c-detail .confirmer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.c-detail .annuler { border: 1px solid var(--c-field); background: var(--c-surface); color: var(--c-ink); }
+.c-detail .confirmer { border: none; background: var(--c-danger); color: #fff; }
+
+/* ----- Décision déjà prise (lecture seule) ----- */
+.c-detail .decision {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid;
+}
+.c-detail .icone {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.c-detail .decision-titre { font-size: 15px; font-weight: 600; }
+.c-detail .decision p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+
+.c-detail .decision-ok { background: var(--c-ok-soft); border-color: var(--c-ok-line); }
+.c-detail .decision-ok .icone { background: var(--c-ok); }
+.c-detail .decision-ok .decision-titre { color: var(--chip-green-fg); }
+.c-detail .decision-ko { background: var(--c-ko-soft); border-color: var(--c-ko-line); }
+.c-detail .decision-ko .icone { background: var(--c-danger); }
+.c-detail .decision-ko .decision-titre { color: var(--chip-red-fg); }
+
+.c-detail .decision .motif { margin-top: 12px; }
+.c-detail .decision .motif-titre { font-size: 13px; font-weight: 600; color: var(--chip-red-fg); }
+.c-detail .decision .motif p { margin: 2px 0 0; line-height: 1.55; }

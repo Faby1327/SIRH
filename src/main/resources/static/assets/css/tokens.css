@@ -1,0 +1,62 @@
+   /* Valeurs reprises à l'identique de la maquette */
+   :root {
+     /* Police */
+     --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+     --font-mono: ui-monospace, Menlo, Consolas, monospace;
+
+     /* Texte et fonds */
+     --c-ink: #1b2430;
+     --c-ink-2: #44505f;
+     --c-muted: #5b6675;
+     --c-bg: #f4f5f8;
+     --c-surface: #ffffff;
+
+     /* Bordures */
+     --c-border: #dde1e8;
+     --c-border-soft: #e7eaf0;
+     --c-field: #b9c2d0;
+
+     /* Accent */
+     --c-accent: #2851a3;
+     --c-accent-dark: #1b3c7d;
+     --c-accent-soft: #e6ecf8;
+
+     /* Menu latéral */
+     --c-side: #14202f;
+     --c-side-active: #22344d;
+     --c-side-card: #1b2a3f;
+     --c-side-text: #c5d0e0;
+     --c-side-muted: #9fb0c8;
+     --c-avatar: #2d4a73;
+     --c-badge: #f5c451;
+     --c-badge-ink: #3b2a00;
+     --c-side-ring: #5e7699;
+
+     /* Pastilles de statut : fond / texte */
+     --chip-gray-bg: #e9ecf1;  --chip-gray-fg: #3c4756;
+     --chip-amber-bg: #fbedcc; --chip-amber-fg: #6f4500;
+     --chip-green-bg: #d9f0e2; --chip-green-fg: #0f5a2e;
+     --chip-red-bg: #fbe4e1;   --chip-red-fg: #7a1f14;
+     --chip-blue-bg: #e1e9f8;  --chip-blue-fg: #1e3f8a;
+
+     /* Avancement et états */
+     --c-step-done: #2851a3;
+     --c-step-current: #8ea7dd;
+     --c-step-todo: #e3e7ed;
+     --c-ok: #1f7a45;
+     --c-danger: #b3261e;
+
+     /* Blocs d'information */
+     --c-ok-soft: #eff8f2;   --c-ok-line: #9ccbb0;
+     --c-ko-soft: #fdf3f2;   --c-ko-line: #e3b4ae;
+     --c-info-line: #b7c8ea;
+     --c-neutral-soft: #f4f5f8;
+
+     /* Boutons désactivés */
+     --c-btn-disabled-bg: #d5dae2;
+     --c-btn-disabled-fg: #4a5565;
+
+     /* Rayons des coins */
+     --r-card: 12px;
+     --r-ctl: 8px;
+   }

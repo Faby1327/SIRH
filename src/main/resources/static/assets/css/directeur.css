@@ -1,0 +1,55 @@
+/*
+  Styles propres à l'espace Directeur (migration du front Vue vers JSP).
+  Chaque bloc est précédé d'une classe « racine » (c-…) qui remplace les <style scoped> de Vue.
+*/
+
+/* ===== Tableau « Suivi des demandes de personnel » (DirecteurDemandesTable.vue) ===== */
+.c-table-directeur .filtre-statut { flex: 1 1 150px; }
+.c-table-directeur .filtre-etape { flex: 1 1 190px; } /* assez large pour « Toutes les étapes » */
+.c-table-directeur .filtre-service { flex: 1 1 170px; }
+.c-table-directeur .tableau { min-width: 956px; }
+.c-table-directeur .ligne {
+  grid-template-columns: 104px minmax(120px, 1.2fr) 116px 56px 124px 112px minmax(140px, 1fr) 100px 84px;
+}
+.c-table-directeur .cout { white-space: nowrap; }
+
+/* ===== Détail (DirecteurDemandeView.vue) ===== */
+/* ----- Suivi des validations : une ligne par étape ----- */
+.c-detail-directeur .suivi { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.c-detail-directeur .validation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--c-border-soft);
+}
+.c-detail-directeur .validation-nom { flex: 0 0 200px; font-size: 15px; font-weight: 500; }
+.c-detail-directeur .validation-corps { flex: 1 1 260px; min-width: 0; }
+.c-detail-directeur .validation-corps p { margin: 0; font-size: 15px; line-height: 1.5; }
+.c-detail-directeur .motif {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--c-ko-soft);
+  border: 1px solid var(--c-ko-line);
+}
+.c-detail-directeur .motif-titre { font-size: 13px; font-weight: 600; color: var(--chip-red-fg); }
+.c-detail-directeur .validation-corps .motif p { margin: 2px 0 0; line-height: 1.55; }
+
+/* ----- Vérification budgétaire : trois cartes ----- */
+.c-detail-directeur .cartes-budget { display: flex; flex-wrap: wrap; gap: 12px; }
+.c-detail-directeur .carte-budget {
+  flex: 1 1 200px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+}
+.c-detail-directeur .carte-budget-label { font-size: 13px; color: var(--c-muted); }
+.c-detail-directeur .carte-budget-valeur { margin-top: 2px; font-size: 18px; font-weight: 600; white-space: nowrap; }
+.c-detail-directeur .carte-budget-ok { background: var(--c-ok-soft); border-color: var(--c-ok-line); }
+.c-detail-directeur .carte-budget-ok .carte-budget-label,
+.c-detail-directeur .carte-budget-ok .carte-budget-valeur { color: var(--chip-green-fg); }
+.c-detail-directeur .note-budget { margin: 0; font-size: 14px; color: var(--c-muted); }
+.c-detail-directeur .texte-budget { margin: 0; font-size: 15px; line-height: 1.5; color: var(--c-ink-2); }

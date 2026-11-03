@@ -1,0 +1,219 @@
+/*
+  Styles propres à l'espace Manager (migration du front Vue vers JSP).
+  Chaque bloc est précédé d'une classe « racine » (c-…) qui remplace les <style scoped> de Vue.
+*/
+
+/* ===== Tableau « Mes demandes de personnel » (ManagerDemandesTable.vue) ===== */
+.c-table-manager .filtre-statut { flex: 1 1 150px; }
+.c-table-manager .filtre-type { flex: 1 1 170px; }
+.c-table-manager .tableau { min-width: 1060px; }
+.c-table-manager .ligne {
+  grid-template-columns: 90px minmax(190px, 1.6fr) 145px 64px 130px minmax(190px, 1.5fr) 112px 150px;
+}
+.c-table-manager .budget { white-space: nowrap; }
+.c-table-manager .actions { display: flex; align-items: center; gap: 8px; }
+.c-table-manager .corbeille {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--c-ko-line);
+  background: var(--c-surface);
+  color: var(--c-danger);
+  cursor: pointer;
+}
+.c-table-manager .corbeille:disabled {
+  border-color: var(--c-border);
+  background: var(--c-bg);
+  color: #9aa6b8; /* gris d'icône désactivée */
+  cursor: not-allowed;
+}
+
+/* ===== Détail d'une demande : encadré de suivi (ManagerDemandeView.vue) ===== */
+/* Une couleur par statut */
+.c-detail-manager .suivi { padding: 14px 16px; border-radius: 10px; border: 1px solid; }
+.c-detail-manager .suivi-titre { font-size: 15px; font-weight: 600; }
+.c-detail-manager .suivi p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+
+.c-detail-manager .suivi-brouillon { background: var(--c-bg); border-color: var(--c-border); }
+.c-detail-manager .suivi-brouillon .suivi-titre { color: var(--chip-gray-fg); }
+.c-detail-manager .suivi-attente { background: var(--chip-blue-bg); border-color: var(--c-info-line); }
+.c-detail-manager .suivi-attente .suivi-titre { color: var(--chip-blue-fg); }
+.c-detail-manager .suivi-valide { background: var(--c-ok-soft); border-color: var(--c-ok-line); }
+.c-detail-manager .suivi-valide .suivi-titre { color: var(--chip-green-fg); }
+.c-detail-manager .suivi-refuse { background: var(--c-ko-soft); border-color: var(--c-ko-line); }
+.c-detail-manager .suivi-refuse .suivi-titre { color: var(--chip-red-fg); }
+
+.c-detail-manager .motif { margin-top: 12px; }
+.c-detail-manager .motif-titre { font-size: 13px; font-weight: 600; color: var(--chip-red-fg); }
+.c-detail-manager .suivi .motif p { margin: 2px 0 0; line-height: 1.55; }
+
+/* ===== Formulaire « Nouvelle demande » / « Modifier la demande » (ManagerNouvelleDemandeView.vue) ===== */
+.c-form > .entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.c-form > .entete .surtitre { margin: 0; font-size: 14px; color: var(--c-muted); }
+.c-form > .entete h1 { margin: 4px 0 0; font-size: 28px; line-height: 1.2; font-weight: 600; }
+.c-form > .entete .reference { margin: 4px 0 0; font-size: 14px; color: var(--c-muted); }
+
+/* Message affiché quand le brouillon à modifier n'existe pas */
+.c-form .carte-vide {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.c-form .carte-vide h2 { margin: 0; font-size: 22px; line-height: 1.25; font-weight: 600; }
+.c-form .carte-vide p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--c-ink-2); }
+
+/* Le formulaire à gauche, le circuit à droite ; ils passent l'un sous l'autre si la place manque */
+.c-form .colonnes { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+
+.c-form .formulaire {
+  flex: 999 1 460px;
+  min-width: 0;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.c-form .groupe { display: flex; flex-direction: column; gap: 10px; }
+.c-form .etiquette { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+.c-form .groupe .etiquette { margin-bottom: 0; }
+
+/* ----- Choix du type de besoin : deux grands boutons ----- */
+.c-form .choix-liste { display: flex; flex-wrap: wrap; gap: 12px; }
+.c-form .choix {
+  flex: 1 1 240px;
+  min-height: 72px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  border-radius: 10px;
+  border: 2px solid #c9d0db; /* gris du bouton non choisi */
+  background: var(--c-surface);
+  color: var(--c-ink);
+  cursor: pointer;
+}
+.c-form .choix input { position: absolute; opacity: 0; pointer-events: none; }
+.c-form .choix-titre { font-size: 16px; font-weight: 600; }
+.c-form .choix-aide { font-size: 14px; color: var(--c-muted); }
+.c-form .choix-actif { border-color: var(--c-accent); background: var(--c-accent-soft); }
+.c-form .choix-actif .choix-aide { color: var(--c-ink-2); }
+
+/* ----- Champs ----- */
+.c-form .rangee { display: flex; flex-wrap: wrap; gap: 20px; }
+.c-form .poste { flex: 2 1 260px; min-width: 0; }
+.c-form .nombre { flex: 1 1 180px; min-width: 0; }
+.c-form .moitie { flex: 1 1 240px; min-width: 0; }
+
+.c-form .champ {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--c-field);
+  border-radius: var(--r-ctl);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+}
+.c-form .motif { min-height: 112px; padding: 10px 12px; line-height: 1.5; resize: vertical; }
+.c-form .aide { margin-top: 6px; font-size: 13px; color: var(--c-muted); }
+.c-form .erreur { margin: 6px 0 0; font-size: 14px; font-weight: 500; color: var(--chip-red-fg); }
+
+/* ----- Bas du formulaire ----- */
+.c-form .pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--c-border-soft);
+}
+.c-form .annuler {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--c-ink-2);
+  text-decoration: none;
+}
+.c-form .boutons { display: flex; flex-wrap: wrap; gap: 12px; }
+.c-form .bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  border: 1px solid var(--c-field);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none; /* « Retour aux demandes » est un lien, pas un bouton */
+  cursor: pointer;
+}
+.c-form .bouton-principal { border-color: var(--c-accent); background: var(--c-accent); color: #fff; }
+
+/* ----- Encadré « Circuit de validation » ----- */
+.c-form .circuit {
+  flex: 1 1 280px;
+  max-width: 360px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.c-form .circuit h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.c-form .circuit ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.c-form .circuit li { display: flex; gap: 12px; align-items: flex-start; }
+.c-form .numero {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #9aa6b8; /* gris du rond « à venir » */
+  background: var(--c-surface);
+  color: var(--c-ink-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.c-form .numero-vous { border: none; background: var(--c-accent); color: #fff; }
+.c-form .circuit-nom { font-size: 15px; font-weight: 600; }
+.c-form .precision { font-weight: 400; color: var(--c-muted); }
+.c-form .circuit-texte { font-size: 14px; color: var(--c-muted); }
+.c-form .note {
+  padding: 12px 14px;
+  border-radius: var(--r-ctl);
+  background: var(--c-bg);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--c-ink-2);
+}
+.c-form .note strong { font-weight: 600; color: var(--c-ink); }

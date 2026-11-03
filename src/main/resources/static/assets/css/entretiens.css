@@ -1,0 +1,97 @@
+/* ===== Entretiens, tests et évaluations ===== */
+.c-entretiens .retour { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--c-muted); text-decoration: none; margin-bottom: 4px; }
+.c-entretiens .retour:hover { color: var(--c-accent); text-decoration: underline; }
+.c-entretiens .c-publication { margin: 0; }
+.c-entretiens .c-publication > .corps { padding: 20px 24px 24px; }
+.c-entretiens .c-publication > .corps > h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+.c-entretiens .c-publication > .corps > p { margin: 0 0 16px; font-size: 14px; color: var(--c-muted); }
+
+.c-entretiens .grille {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.c-entretiens .grille-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.c-entretiens .champ-ligne { display: flex; flex-direction: column; gap: 6px; }
+.c-entretiens .etiquette { font-size: 14px; font-weight: 500; color: var(--c-ink); }
+.c-entretiens .champ {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-field);
+  border-radius: var(--r-ctl);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+  box-sizing: border-box;
+}
+.c-entretiens textarea.champ { min-height: 84px; resize: vertical; line-height: 1.5; }
+.c-entretiens .aide { margin: 0; font-size: 13px; color: var(--c-muted); }
+.c-entretiens .evaluateurs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 12px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+  background: var(--c-bg);
+}
+.c-entretiens .evaluateur { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.c-entretiens .actions,
+.c-entretiens .actions-bas { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.c-entretiens .actions-bas { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-border-soft); }
+.c-entretiens .sous-carte {
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--c-surface);
+}
+.c-entretiens .sous-carte:last-child { margin-bottom: 0; }
+.c-entretiens .sous-carte h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+.c-entretiens .sous-carte p { margin: 4px 0; font-size: 14px; line-height: 1.5; }
+.c-entretiens .muted { color: var(--c-muted); font-size: 14px; }
+.c-entretiens .note {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--c-bg);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--c-ink-2);
+}
+.c-entretiens .c-publication .defilement { overflow-x: auto; }
+.c-entretiens .c-publication .table-offres { width: 100%; min-width: 980px; border-collapse: collapse; font-size: 14px; }
+.c-entretiens .c-publication .table-offres thead th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-ink-2);
+  font-size: 13px;
+  padding: 10px 16px;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-border-soft);
+  white-space: nowrap;
+}
+.c-entretiens .c-publication .table-offres td { padding: 12px 16px; border-top: 1px solid var(--c-border-soft); vertical-align: top; }
+.c-entretiens .c-publication .table-offres td .muted { display: block; margin-top: 2px; }
+.c-entretiens .c-publication .actions { flex-wrap: nowrap; white-space: nowrap; }
+.c-entretiens .c-publication .actions-offre form { display: inline; }
+.c-entretiens .stats { display: flex; flex-wrap: wrap; gap: 16px; }
+.c-entretiens .stat {
+  flex: 1 1 160px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 16px 20px;
+}
+.c-entretiens .stat-label { font-size: 14px; color: var(--c-muted); }
+.c-entretiens .stat-valeur { font-size: 28px; font-weight: 600; margin-top: 2px; }
+
+@media (max-width: 760px) {
+  .c-entretiens .grille,
+  .c-entretiens .grille-3 { grid-template-columns: 1fr; }
+  .c-entretiens .c-publication > .corps { padding: 16px; }
+}

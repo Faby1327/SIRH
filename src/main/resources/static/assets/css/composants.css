@@ -1,0 +1,336 @@
+/*
+  Composants et structures partagés entre les espaces (migration du front Vue vers JSP).
+  Même principe que besoins.css : chaque bloc est précédé d'une classe « racine » (c-…)
+  pour remplacer les <style scoped> de Vue. Les valeurs sont celles du projet Vue.
+*/
+
+/* ----- Tuile de chiffre (StatTile.vue) ----- */
+.c-tuile {
+  flex: 1 1 180px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.c-tuile .tuile-label { font-size: 14px; color: var(--c-muted); }
+.c-tuile .tuile-valeur { font-size: 32px; font-weight: 600; line-height: 1.1; }
+
+/* ----- Puce de statut (StatusChip.vue) ----- */
+.puce {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.puce-brouillon { background: var(--chip-gray-bg); color: var(--chip-gray-fg); }
+.puce-attente { background: var(--chip-amber-bg); color: var(--chip-amber-fg); }
+.puce-valide { background: var(--chip-green-bg); color: var(--chip-green-fg); }
+.puce-info { background: #e8f2ff; color: #1f4e79; }
+.puce-refuse { background: var(--chip-red-bg); color: var(--chip-red-fg); }
+
+/* ----- Barre d'avancement des tableaux (StepBar.vue) ----- */
+.c-stepbar { display: flex; flex-direction: column; gap: 6px; }
+.c-stepbar .libelle { font-size: 13px; color: var(--c-ink-2); }
+.c-stepbar .barre { display: flex; gap: 3px; }
+.c-stepbar .segment { flex: 1; height: 6px; border-radius: 3px; }
+.c-stepbar .faite { background: var(--c-step-done); }
+.c-stepbar .en-cours { background: var(--c-step-current); }
+.c-stepbar .a-faire { background: var(--c-step-todo); }
+.c-stepbar .approuvee { background: var(--c-ok); }
+.c-stepbar .refusee { background: var(--c-danger); }
+
+/* ----- Avancement des pages Détail (Avancement.vue) ----- */
+.c-avancement {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.c-avancement .etape { display: flex; flex-direction: column; gap: 6px; }
+.c-avancement .trait { height: 6px; border-radius: 3px; }
+.c-avancement .libelle { font-size: 13px; }
+
+.c-avancement .faite .trait { background: var(--c-step-done); }
+.c-avancement .faite .libelle { font-weight: 500; }
+
+.c-avancement .en-cours .trait { background: var(--c-step-current); }
+.c-avancement .en-cours .libelle { font-weight: 600; color: var(--chip-blue-fg); }
+
+.c-avancement .a-faire .trait { background: var(--c-step-todo); }
+.c-avancement .a-faire .libelle { color: var(--c-muted); }
+
+.c-avancement .approuvee .trait { background: var(--c-ok); }
+.c-avancement .approuvee .libelle { font-weight: 500; color: var(--chip-green-fg); }
+
+.c-avancement .refusee .trait { background: var(--c-danger); }
+.c-avancement .refusee .libelle { font-weight: 600; color: var(--chip-red-fg); }
+
+/* ----- Bandeau de succès (BandeauSucces.vue) ----- */
+.bandeau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--chip-green-bg);
+  color: var(--chip-green-fg);
+  font-size: 15px;
+}
+.bandeau-erreur { background: var(--chip-red-bg); color: var(--chip-red-fg); }
+.bandeau .fermer {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--r-ctl);
+  border: 1px solid #7fb896; /* vert moyen du contour */
+  background: transparent;
+  color: var(--chip-green-fg);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ----- Boîte de confirmation (BoiteConfirmation.vue) ----- */
+/* Le voile sombre couvre tout l'écran, par-dessus le reste de la page */
+.voile {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 32, 47, 0.55);
+}
+.voile .boite {
+  width: 100%;
+  max-width: 440px;
+  background: var(--c-surface);
+  border-radius: var(--r-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(20, 32, 47, 0.35);
+}
+.voile h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.voile p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--c-ink-2); }
+
+.voile .boutons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+}
+.voile .annuler,
+.voile .confirmer {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.voile .annuler { border: 1px solid var(--c-field); background: var(--c-surface); color: var(--c-ink); }
+.voile .confirmer { border: none; background: var(--c-danger); color: #fff; }
+
+/* ===== Pages d'accueil des espaces : en-tête et tuiles ===== */
+.c-page-liste > .entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.c-page-liste > .entete .surtitre { margin: 0; font-size: 14px; color: var(--c-muted); }
+.c-page-liste > .entete h1 { margin: 4px 0 0; font-size: 28px; line-height: 1.2; font-weight: 600; }
+
+.c-page-liste .bouton-principal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  background: var(--c-accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.c-page-liste > .tuiles { display: flex; flex-wrap: wrap; gap: 16px; }
+
+/* ===== Tableaux de demandes : ce qu'ont en commun les quatre espaces ===== */
+.c-table {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.c-table .entete { padding: 20px 24px 16px; }
+.c-table .entete h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.c-table .entete p { margin: 4px 0 0; font-size: 14px; color: var(--c-muted); }
+
+/* ----- Recherche et filtres ----- */
+.c-table .filtres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 0 24px 16px;
+}
+.c-table .recherche { position: relative; flex: 3 1 300px; min-width: 0; }
+.c-table .loupe {
+  position: absolute;
+  left: 12px;
+  top: 13px;
+  color: var(--c-muted);
+  pointer-events: none; /* un clic sur la loupe atteint le champ */
+}
+.c-table .filtre { min-width: 0; }
+.c-table .filtre label { display: block; margin-bottom: 4px; font-size: 13px; color: var(--c-muted); }
+
+.c-table .champ {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--c-field);
+  border-radius: var(--r-ctl);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-family: inherit;
+  font-size: 15px;
+}
+.c-table .champ-recherche { padding-left: 40px; } /* de la place pour la loupe */
+
+.c-table .reinit {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--r-ctl);
+  border: 1px solid var(--c-field);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Le tableau défile de gauche à droite si l'écran est trop étroit */
+.c-table .defilement { overflow-x: auto; }
+
+.c-table .ligne {
+  display: grid;
+  align-items: center;
+  border-top: 1px solid var(--c-border-soft);
+}
+.c-table .ligne-titres { background: var(--c-bg); }
+.c-table .titre { padding: 10px 12px; font-size: 13px; font-weight: 500; color: var(--c-muted); }
+.c-table .cellule { padding: 14px 12px; font-size: 14px; min-width: 0; }
+.c-table .numero { color: var(--c-muted); white-space: nowrap; }
+.c-table .poste { font-weight: 500; }
+.c-table .date { color: var(--c-muted); white-space: nowrap; }
+
+.c-table .bouton {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--c-field);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.c-table .vide {
+  margin: 0;
+  padding: 32px 24px;
+  border-top: 1px solid var(--c-border-soft);
+  text-align: center;
+  font-size: 15px;
+  color: var(--c-muted);
+}
+.c-table .legende {
+  margin: 0;
+  padding: 14px 24px;
+  border-top: 1px solid var(--c-border-soft);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+
+/* ===== Pages Détail : structure commune aux quatre espaces ===== */
+.c-detail > .entete { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.c-detail .retour,
+.c-detail .bouton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  border: 1px solid var(--c-field);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.c-detail > .entete .surtitre { margin: 0; font-size: 14px; color: var(--c-muted); }
+.c-detail > .entete h1 { margin: 4px 0 0; font-size: 28px; line-height: 1.2; font-weight: 600; }
+
+.c-detail > .carte {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.c-detail .titre-ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.c-detail .reference { font-size: 14px; color: var(--c-muted); }
+.c-detail h2 { margin: 4px 0 0; font-size: 22px; line-height: 1.25; font-weight: 600; }
+.c-detail .introuvable { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: var(--c-ink-2); }
+
+/* ----- Blocs « Informations », « Suivi »… ----- */
+.c-detail .bloc {
+  border-top: 1px solid var(--c-border-soft);
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.c-detail h3 { margin: 0; font-size: 16px; font-weight: 600; }
+
+.c-detail .infos { margin: 0; display: flex; flex-wrap: wrap; gap: 16px 24px; }
+.c-detail .info { flex: 1 1 200px; min-width: 0; }
+.c-detail .info-large { flex-basis: 100%; }
+.c-detail dt { font-size: 13px; color: var(--c-muted); }
+.c-detail dd { margin: 2px 0 0; font-size: 15px; font-weight: 500; }
+.c-detail .sans-coupure { white-space: nowrap; }
+.c-detail .texte { font-weight: 400; line-height: 1.55; }

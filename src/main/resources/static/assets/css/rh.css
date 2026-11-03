@@ -1,0 +1,845 @@
+/*
+  Styles propres à l'espace RH (migration du front Vue vers JSP).
+  Chaque bloc est précédé d'une classe « racine » (c-…) qui remplace les <style scoped> de Vue.
+*/
+
+/* ===== Annuaire RH : employés et contrats ===== */
+.c-page-liste.c-annuaire-rh {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.c-annuaire-rh > .entete {
+  padding: 8px 4px 0;
+}
+
+.c-annuaire-rh > .entete h1 {
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -0.02em;
+}
+
+.c-annuaire-rh > .entete p:not(.surtitre) {
+  margin: 8px 0 0;
+  color: var(--c-muted);
+  font-size: 15px;
+}
+
+.c-annuaire-rh .c-table {
+  box-shadow: 0 8px 24px rgba(20, 32, 47, 0.06);
+}
+
+.c-annuaire-rh .table-offres {
+  width: 100%;
+  min-width: 880px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.c-annuaire-rh .table-offres th {
+  padding: 13px 16px;
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-border);
+  color: var(--c-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.c-annuaire-rh .table-offres td {
+  padding: 15px 16px;
+  border-top: 1px solid var(--c-border-soft);
+  color: var(--c-ink-2);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.c-annuaire-rh .table-offres tbody tr {
+  transition: background .15s ease;
+}
+
+.c-annuaire-rh .table-offres tbody tr:hover {
+  background: var(--c-neutral-soft);
+}
+
+.c-annuaire-rh .table-offres td:first-child {
+  color: var(--c-ink);
+  font-weight: 600;
+}
+
+.c-annuaire-rh .table-offres .bouton {
+  min-height: 36px;
+  padding: 0 12px;
+  border-color: var(--c-border);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-accent);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.c-annuaire-rh .table-offres .bouton:hover {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: #fff;
+}
+
+.c-annuaire-rh .defilement {
+  overflow-x: auto;
+}
+
+@media (max-width: 760px) {
+  .c-annuaire-rh {
+    padding: 20px 14px;
+  }
+  .c-annuaire-rh .c-table .entete {
+    padding: 18px;
+  }
+}
+
+/* ===== Dossier détaillé d'un employé ===== */
+.c-dossier-employe > .dossier-retour { margin: 2px 0 -8px; }
+.dossier-retour a {
+  color: var(--c-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.dossier-retour a:hover { color: var(--c-accent); }
+.dossier-hero {
+  align-items: center !important;
+  padding: 22px 26px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  background: linear-gradient(135deg, #fff 0%, #f3f7fd 100%);
+  box-shadow: 0 8px 24px rgba(20, 32, 47, .06);
+}
+.dossier-identite { display: flex; align-items: center; gap: 16px; }
+.dossier-avatar {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 16px;
+  background: #dce8fb;
+  color: #2851a3;
+  font-size: 19px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.dossier-hero h1 { margin: 3px 0 6px !important; font-size: 30px !important; }
+.dossier-reference { display: flex; align-items: center; gap: 9px; margin: 0; color: var(--c-muted); font-size: 14px; }
+.dossier-reference strong { color: var(--c-accent); }
+.dossier-statut, .dossier-contract-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: var(--chip-green-bg);
+  color: var(--chip-green-fg);
+  font-size: 12px;
+  font-weight: 700;
+}
+.dossier-alert { padding: 13px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; }
+.dossier-alert-ok { border: 1px solid #b7dcc1; background: #effaf2; color: #176b38; }
+.dossier-alert-error { border: 1px solid #e4bbb5; background: #fff4f2; color: #9a2e25; }
+.dossier-card { overflow: hidden; box-shadow: 0 6px 20px rgba(20, 32, 47, .045); }
+.dossier-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+.dossier-card-heading > div { display: flex; align-items: flex-start; gap: 12px; }
+.dossier-card-heading h2 { margin: 0; color: var(--c-ink); font-size: 18px; }
+.dossier-card-heading p { margin: 4px 0 0; color: var(--c-muted); font-size: 13px; }
+.dossier-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 9px;
+  background: #e5edfc;
+  color: #31599f;
+  font-size: 11px;
+  font-weight: 700;
+}
+.dossier-icon-green { background: #e2f3e7; color: #287747; }
+.dossier-icon-blue { background: #e5edfc; color: #31599f; }
+.dossier-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--c-border-soft);
+}
+.dossier-info-grid > div { display: flex; flex-direction: column; gap: 6px; padding: 17px 20px; background: #fbfcfe; }
+.dossier-info-grid span { color: var(--c-muted); font-size: 12px; }
+.dossier-info-grid strong { color: var(--c-ink-2); font-size: 14px; font-weight: 600; }
+.dossier-status-form {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 18px 20px;
+  background: #f7f9fc;
+  border-top: 1px solid var(--c-border-soft);
+}
+.dossier-status-form label, .dossier-form-grid label { display: flex; flex-direction: column; gap: 6px; color: var(--c-muted); font-size: 12px; font-weight: 600; }
+.dossier-status-form .champ,
+.dossier-form-grid .champ {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--c-ink);
+  font-family: inherit;
+  font-size: 14px;
+  box-shadow: inset 0 1px 2px rgba(20, 32, 47, .04);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.dossier-status-form .champ { min-width: 190px; }
+.dossier-status-form .champ:hover,
+.dossier-form-grid .champ:hover { border-color: #9eacc0; }
+.dossier-status-form .champ:focus,
+.dossier-form-grid .champ:focus {
+  border-color: var(--c-accent);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(49, 89, 159, .14);
+}
+.dossier-form-grid input[type="date"] { color-scheme: light; }
+.dossier-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  padding: 22px 24px 26px;
+}
+.dossier-form-grid .champ { width: 100%; box-sizing: border-box; }
+.dossier-form-grid small { font-weight: 400; }
+.dossier-form-submit { display: flex; align-items: flex-end; }
+.dossier-form-submit .bouton { min-height: 44px; width: 100%; }
+.dossier-contract-link { color: var(--c-accent); font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.dossier-contract-link:hover { text-decoration: underline; }
+.c-dossier-employe .table-offres { width: 100%; min-width: 760px; border-collapse: collapse; }
+.c-dossier-employe .table-offres th { padding: 12px 16px; background: var(--c-bg); color: var(--c-muted); font-size: 11px; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.c-dossier-employe .table-offres td { padding: 14px 16px; border-top: 1px solid var(--c-border-soft); white-space: nowrap; }
+.dossier-contract-status.is-ended { background: #edf0f4; color: #657386; }
+.c-dossier-employe .bouton-danger { border: 1px solid #e4bbb5; background: #fff4f2; color: #9a2e25; }
+.dossier-empty { padding: 30px !important; color: var(--c-muted); text-align: center; }
+
+/* ===== Paie ===== */
+.c-paie-page .paie-period {
+  padding: 9px 14px;
+  border: 1px solid #d6e0f3;
+  border-radius: 999px;
+  background: #f1f5fd;
+  color: #31599f;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.c-paie-page .table-offres { width: 100%; min-width: 900px; border-collapse: collapse; }
+.c-paie-page .table-offres th { padding: 12px 16px; background: var(--c-bg); color: var(--c-muted); font-size: 11px; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.c-paie-page .table-offres td { padding: 15px 16px; border-top: 1px solid var(--c-border-soft); white-space: nowrap; }
+.paie-muted { display: block; margin-top: 4px; color: var(--c-muted); font-size: 12px; }
+.paie-status { display: inline-flex; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.paie-status-BROUILLON { background: #edf0f4; color: #586577; }
+.paie-status-VALIDEE { background: #e4edfc; color: #2e579e; }
+.paie-status-PAYEE { background: #d9f0e2; color: #0f5a2e; }
+.paie-status-ANNULEE { background: #fbe4e1; color: #7a1f14; }
+.c-paie-page .table-offres .bouton { min-height: 36px; padding: 0 12px; border: 1px solid var(--c-border); border-radius: 8px; background: #fff; color: var(--c-accent); font-size: 13px; text-decoration: none; }
+.c-paie-page .table-offres .bouton:hover { border-color: var(--c-accent); background: var(--c-accent); color: #fff; }
+.paie-total { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 20px 24px; background: #f4faf5; border-top: 1px solid #cfe4d4; }
+.paie-total span { color: #527361; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+.paie-total strong { color: #237044; font-size: 24px; }
+.paie-action-content { padding: 22px 24px 26px; color: var(--c-ink-2); }
+.paie-action-content p { margin: 0 0 16px; font-size: 14px; }
+.paie-success { color: #176b38; font-weight: 700; }
+.paie-payment { display: grid; grid-template-columns: 120px 1fr; gap: 10px 18px; max-width: 560px; padding: 15px; border: 1px solid #cfe1d5; border-radius: 10px; background: #f1faf3; }
+.paie-payment span { color: #527361; font-size: 12px; }
+.paie-payment strong { color: #245f3b; font-size: 13px; }
+@media (max-width: 560px) {
+  .c-paie-page > .entete { align-items: flex-start; flex-direction: column; }
+  .paie-total { align-items: flex-start; flex-direction: column; }
+  .paie-payment { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .dossier-info-grid, .dossier-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .dossier-hero { align-items: flex-start !important; flex-direction: column; }
+  .dossier-info-grid, .dossier-form-grid { grid-template-columns: 1fr; }
+  .dossier-card-heading { align-items: flex-start; flex-direction: column; }
+  .dossier-status-form .champ { width: 100%; }
+  .dossier-status-form .bouton { width: 100%; }
+}
+
+/* ===== Tableau « Demandes de personnel » (RhDemandesTable.vue) ===== */
+.c-table-rh .filtre-statut { flex: 1 1 150px; }
+.c-table-rh .filtre-type { flex: 1 1 170px; }
+.c-table-rh .filtre-service { flex: 1 1 160px; }
+.c-table-rh .tableau { min-width: 926px; }
+.c-table-rh .ligne {
+  grid-template-columns: 104px minmax(120px, 1.2fr) 116px 124px 56px minmax(110px, 1fr) 112px 100px 84px;
+}
+
+/* ===== Détail : les 3 vérifications (RhDemandeView.vue) ===== */
+.c-detail-rh .verifs { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.c-detail-rh .verif input { position: absolute; opacity: 0; pointer-events: none; }
+.c-detail-rh .verif {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--c-field);
+  border-radius: 10px;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+.c-detail-rh .verif.cochee { border-color: var(--c-ok-line); background: var(--c-ok-soft); }
+.c-detail-rh .case {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid #8a96a8; /* gris de la case vide (maquette) */
+  background: var(--c-surface);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.c-detail-rh .cochee .case { border: none; background: var(--c-ok); }
+
+/* ===== Publication des offres d'emploi (bloc 2 — Recrutement) ===== */
+.c-publication {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.c-publication > .entete { padding: 20px 24px 16px; }
+.c-publication > .entete h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.c-publication > .entete p { margin: 4px 0 0; font-size: 14px; color: var(--c-muted); }
+.c-publication .bandeau { margin: 0 24px 16px; }
+.c-publication h3 { margin: 0; padding: 0 24px; font-size: 15px; font-weight: 600; }
+.c-publication .vide { margin: 8px 0 0; padding: 0 24px 8px; font-size: 14px; color: var(--c-muted); }
+
+.c-publication .a-publier { padding: 18px 24px 4px; border-top: 1px solid var(--c-border-soft); }
+.c-publication .liste-a-publier { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+.c-publication .offre-a-publier {
+  padding: 16px 18px;
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  background: var(--c-neutral-soft);
+}
+.c-publication .offre-a-publier header { margin-bottom: 12px; }
+.c-publication .offre-ref { font-size: 15px; font-weight: 600; }
+.c-publication .offre-meta { margin-top: 2px; font-size: 13px; color: var(--c-muted); }
+.c-publication .offre-a-publier form { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.c-publication .champ-ligne { width: 100%; }
+.c-publication .champ-ligne label { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 500; }
+.c-publication .champ {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--c-field);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+.c-publication .champ:focus { outline: 2px solid var(--c-accent); outline-offset: 1px; }
+.c-publication textarea.champ { resize: vertical; min-height: 84px; }
+
+.c-publication .bouton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--c-field);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+.c-publication .bouton-principal { border-color: var(--c-accent); background: var(--c-accent); color: #fff; }
+.c-publication .bouton-principal:hover { background: var(--c-accent-dark); }
+.c-publication .bouton-danger { border-color: var(--c-ko-line); background: var(--c-ko-soft); color: var(--c-danger); }
+
+.c-publication .offres-publiees { margin-top: 22px; padding: 18px 24px 22px; border-top: 1px solid var(--c-border-soft); }
+.c-publication .defilement { margin-top: 12px; overflow-x: auto; }
+.c-publication .table-offres { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px; }
+.c-publication .table-offres th {
+  padding: 10px 12px;
+  background: var(--c-bg);
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+.c-publication .table-offres td { padding: 12px; border-top: 1px solid var(--c-border-soft); vertical-align: middle; }
+.c-publication .actions-offre { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.c-publication .actions-offre form { display: contents; }
+.c-publication .actions-offre .texte { font-size: 13px; color: var(--c-muted); }
+
+/* ===== Candidatures reçues (bloc 2 — Recrutement) ===== */
+.c-publication .offres-publiees > h3 { padding: 0; }
+.c-publication .offres-publiees .vide { padding: 10px 0 4px; }
+
+.c-publication .fiche-candidat {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin: 14px 0 0;
+}
+.c-publication .fiche-candidat .info dt { font-size: 12px; color: var(--c-muted); }
+.c-publication .fiche-candidat .info dd { margin: 3px 0 0; font-size: 15px; font-weight: 500; }
+
+.c-publication .titre-reponses { margin-top: 22px; }
+.c-publication .message-candidat {
+  margin: 10px 0 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--c-neutral-soft);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* ===== Propositions d'embauche ===== */
+.c-embauches.page-espace {
+  max-width: 1680px;
+  margin: 0 auto;
+}
+
+.c-embauches .entete-embauches {
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.c-embauches .entete-navigation {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.c-embauches > .entete .retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--c-muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.c-embauches .fil-ariane {
+  color: var(--c-muted);
+  font-size: 13px;
+}
+
+.c-embauches .hero-contenu {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 26px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5fc 100%);
+  box-shadow: 0 8px 24px rgba(20, 32, 47, 0.06);
+}
+
+.c-embauches .hero-contenu h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.c-embauches .hero-description {
+  margin: 0;
+  color: var(--c-ink-2);
+  font-size: 16px;
+}
+
+.c-embauches .separateur {
+  margin: 0 8px;
+  color: var(--c-muted);
+}
+
+.c-embauches .hero-reference {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 130px;
+}
+
+.c-embauches .hero-reference-label {
+  color: var(--c-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.c-embauches .hero-reference strong {
+  font-size: 18px;
+}
+
+.c-embauches .hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  padding: 0 4px;
+  color: var(--c-muted);
+  font-size: 13px;
+}
+
+.c-embauches .hero-meta strong {
+  color: var(--c-ink-2);
+}
+
+.c-embauches > .entete .retour:hover {
+  color: var(--c-accent);
+  text-decoration: underline;
+}
+
+.c-embauches > .carte {
+  overflow: hidden;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+}
+
+.c-embauches .carte-en-tete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 16px;
+}
+
+.c-embauches .carte-en-tete h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.c-embauches .carte-sous-titre {
+  margin: 4px 0 0;
+  color: var(--c-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.c-embauches .compteur {
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--c-info-line);
+  border-radius: 999px;
+  background: var(--c-accent-soft);
+  color: var(--c-accent-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.c-embauches .compteur-sombre {
+  border-color: var(--c-border);
+  background: var(--c-bg);
+  color: var(--c-ink-2);
+}
+
+.c-embauches .carte-corps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 24px 20px;
+  color: var(--c-ink-2);
+}
+
+.c-embauches .indicateur {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-neutral-soft);
+}
+
+.c-embauches .indicateur-label {
+  color: var(--c-muted);
+  font-size: 13px;
+}
+
+.c-embauches .indicateur-valeur {
+  color: var(--c-ink);
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.c-embauches .indicateur-restant {
+  border-color: var(--c-info-line);
+  background: var(--c-accent-soft);
+}
+
+.c-embauches .tableau-conteneur {
+  overflow-x: auto;
+}
+
+.c-embauches .table-offres {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.c-embauches .table-offres thead th {
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--c-border);
+  background: var(--c-bg);
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.c-embauches .table-offres tbody tr {
+  background: var(--c-surface);
+}
+
+.c-embauches .table-offres tbody tr:hover {
+  background: #f8faff;
+}
+
+.c-embauches .table-offres td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--c-border-soft);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.c-embauches .tableau {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+}
+
+.c-embauches .tableau-eligibles {
+  min-width: 1280px;
+}
+
+.c-embauches .table-offres.tableau-eligibles {
+  min-width: 1280px;
+}
+
+.c-embauches .tableau th {
+  padding: 10px 24px;
+  background: var(--c-bg);
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.c-embauches .tableau td {
+  padding: 14px 24px;
+  border-top: 1px solid var(--c-border-soft);
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.c-embauches .tableau th:nth-child(1),
+.c-embauches .tableau td:nth-child(1) { width: 17%; }
+
+.c-embauches .tableau th:nth-child(2),
+.c-embauches .tableau td:nth-child(2) { width: 21%; }
+
+.c-embauches .tableau th:nth-child(3),
+.c-embauches .tableau td:nth-child(3) { width: 14%; }
+
+.c-embauches .tableau th:nth-child(4),
+.c-embauches .tableau td:nth-child(4) { width: 15%; }
+
+.c-embauches .tableau th:last-child,
+.c-embauches .tableau td:last-child {
+  width: 33%;
+}
+
+.c-embauches .table-offres form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 390px;
+}
+
+.c-embauches .table-offres input[type="text"] {
+  min-height: 40px;
+  width: 220px;
+  min-width: 0;
+  padding: 0 10px;
+  border: 1px solid var(--c-field);
+  border-radius: var(--r-ctl);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 14px;
+}
+
+.c-embauches .table-offres input[type="text"]:focus {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 1px;
+}
+
+.c-embauches .bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--c-accent);
+  border-radius: var(--r-ctl);
+  background: var(--c-accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.c-embauches .bouton:hover {
+  background: var(--c-accent-dark);
+}
+
+.c-embauches .bouton-secondaire {
+  border-color: var(--c-field);
+  background: var(--c-surface);
+  color: var(--c-ink-2);
+  text-decoration: none;
+}
+
+.c-embauches .bouton-secondaire:hover {
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+
+.c-embauches .vide {
+  padding: 28px 24px;
+  color: var(--c-muted);
+  text-align: center;
+}
+
+.c-embauches .date-cell {
+  white-space: nowrap;
+  color: var(--c-muted);
+}
+
+.c-embauches .commentaire-cell {
+  color: var(--c-ink-2);
+  white-space: normal;
+}
+
+.c-embauches .places-atteintes {
+  color: var(--c-muted);
+  font-size: 14px;
+}
+
+.c-embauches .alerte {
+  padding: 12px 16px;
+  border: 1px solid;
+  border-radius: var(--r-ctl);
+  font-size: 14px;
+}
+
+.c-embauches .alerte-succes {
+  border-color: var(--c-ok-line);
+  background: var(--c-ok-soft);
+  color: var(--chip-green-fg);
+}
+
+.c-embauches .alerte-erreur {
+  border-color: var(--c-ko-line);
+  background: var(--c-ko-soft);
+  color: var(--c-danger);
+}
+
+@media (max-width: 760px) {
+  .c-embauches.page-espace {
+    padding: 20px 16px;
+  }
+
+  .c-embauches .carte-en-tete,
+  .c-embauches .carte-corps {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .c-embauches .carte-corps {
+    grid-template-columns: 1fr;
+  }
+
+  .c-embauches .hero-contenu {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .c-embauches .hero-reference {
+    align-items: flex-start;
+  }
+
+  .c-embauches .carte-en-tete {
+    flex-direction: column;
+  }
+}
+
+/* ===== Présélection des candidats ===== */
+.c-publication .resume-preselection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 14px;
+}
+.c-publication .form-preselection { margin-top: 14px; }
+.c-publication .cellule-preselection { width: 120px; text-align: center; }
+.c-publication .cellule-preselection input {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--c-accent);
+}
+.c-publication .actions-preselection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+.c-publication .actions-preselection .champ-ligne { flex: 1 1 260px; margin-bottom: 0; }
+.c-publication .aide { margin: 4px 0 0; font-size: 12px; color: var(--c-muted); }
+.c-publication .facultatif { font-size: 12px; font-weight: 400; color: var(--c-muted); }

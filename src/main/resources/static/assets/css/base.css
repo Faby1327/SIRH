@@ -1,0 +1,32 @@
+   @import './tokens.css';
+
+   *, *::before, *::after { box-sizing: border-box; }
+
+   body {
+     margin: 0;
+     font-family: var(--font-sans);
+     color: var(--c-ink);
+     background: var(--c-bg);
+   }
+
+   button, input, select, textarea { font-family: inherit; }
+
+   a { color: var(--c-accent); }
+   a:hover { color: var(--c-accent-dark); }
+
+   button:focus-visible,
+   a:focus-visible,
+   input:focus-visible,
+   select:focus-visible,
+   textarea:focus-visible {
+     outline: 2px solid var(--c-accent);
+     outline-offset: 2px;
+   }
+
+   /* Zone de contenu d'une page d'espace (à droite de la barre latérale) */
+.page-espace {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}

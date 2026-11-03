@@ -1,0 +1,129 @@
+/*
+  Styles propres à l'espace Finance (migration du front Vue vers JSP).
+  Le tableau « Budgets par département » (c-budgets) est aussi utilisé par la Direction.
+  Chaque bloc est précédé d'une classe « racine » (c-…) qui remplace les <style scoped> de Vue.
+*/
+
+/* ===== Tableau « Demandes et dépenses à vérifier » (FinanceDemandesTable.vue) ===== */
+.c-table-finance .filtre-statut { flex: 1 1 150px; }
+.c-table-finance .filtre-dept { flex: 1 1 200px; } /* assez large pour « Tous les départements » */
+.c-table-finance .filtre-compat { flex: 1 1 160px; }
+.c-table-finance .tableau { min-width: 955px; width: 100%; }
+.c-table-finance .ligne {
+  grid-template-columns: 80px 1.35fr 1fr 1.05fr 1.15fr 1fr .95fr .95fr 70px;
+}
+.c-table-finance .cout { white-space: nowrap; }
+.c-table-finance .cellule:last-child { white-space: nowrap; }
+.c-table-finance .non-chiffree { color: var(--c-muted); }
+
+/* ===== Détail : budget, dépense et verdict (FinanceDemandeView.vue) ===== */
+/* Des lignes « libellé ........ montant » */
+.c-detail-finance .ligne-budget {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  font-size: 15px;
+  padding: 12px 0;
+  border-top: 1px solid var(--c-border-soft);
+}
+.c-detail-finance .libelle { color: var(--c-ink-2); }
+.c-detail-finance .retrait { padding-left: 16px; }
+.c-detail-finance .precision { font-size: 13px; color: var(--c-muted); }
+.c-detail-finance .valeur { font-weight: 500; white-space: nowrap; }
+.c-detail-finance .total {
+  padding: 12px 14px;
+  margin-top: 4px;
+  background: var(--c-bg);
+  border-top: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.c-detail-finance .remarque { margin: 0; font-size: 14px; color: var(--c-muted); }
+
+/* ----- Verdict de compatibilité ----- */
+.c-detail-finance .verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  border: 1px solid;
+}
+.c-detail-finance .verdict-texte { display: flex; gap: 12px; align-items: flex-start; flex: 1 1 320px; min-width: 0; }
+.c-detail-finance .verdict-titre { font-size: 16px; font-weight: 600; }
+.c-detail-finance .verdict p { margin: 4px 0 0; font-size: 15px; line-height: 1.5; }
+.c-detail-finance .apres { text-align: right; }
+.c-detail-finance .apres-label { font-size: 13px; color: var(--c-ink-2); }
+.c-detail-finance .apres-montant { font-size: 26px; font-weight: 600; white-space: nowrap; }
+
+.c-detail-finance .verdict-ok { background: var(--c-ok-soft); border-color: var(--c-ok-line); }
+.c-detail-finance .verdict-ok .icone { background: var(--c-ok); }
+.c-detail-finance .verdict-ok .verdict-titre,
+.c-detail-finance .verdict-ok .apres-montant { color: var(--chip-green-fg); }
+.c-detail-finance .verdict-ko { background: var(--c-ko-soft); border-color: var(--c-ko-line); }
+.c-detail-finance .verdict-ko .icone { background: var(--c-danger); }
+.c-detail-finance .verdict-ko .verdict-titre,
+.c-detail-finance .verdict-ko .apres-montant { color: var(--chip-red-fg); }
+.c-detail-finance .verdict-inconnu { background: var(--c-neutral-soft); border-color: var(--c-border); }
+.c-detail-finance .verdict-inconnu .icone { background: var(--c-muted); }
+.c-detail-finance .verdict-inconnu .verdict-titre,
+.c-detail-finance .verdict-inconnu .apres-montant { color: var(--c-ink-2); }
+
+/* La barre de 20 cases : bleu = la dépense, vert = ce qui reste, rouge = dépassement */
+.c-detail-finance .jauge { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; }
+.c-detail-finance .segment { height: 10px; border-radius: 2px; }
+.c-detail-finance .segment-cout { background: var(--c-step-current); }
+.c-detail-finance .segment-reste { background: var(--c-ok); }
+.c-detail-finance .segment-depasse { background: var(--c-danger); }
+.c-detail-finance .jauge-texte { margin: 0; font-size: 14px; color: var(--c-ink-2); }
+
+/* ===== Tableau « Budgets par département » (BudgetsDepartements.vue) ===== */
+.c-budgets {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
+.c-budgets .entete { padding: 20px 24px 16px; }
+.c-budgets h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.c-budgets .entete p { margin: 4px 0 0; font-size: 14px; color: var(--c-muted); }
+
+/* Le tableau défile de gauche à droite si l'écran est trop étroit */
+.c-budgets .defilement { overflow-x: auto; }
+.c-budgets .tableau { min-width: 908px; }
+
+.c-budgets .ligne {
+  display: grid;
+  grid-template-columns: minmax(130px, 1.2fr) 124px 132px 124px 124px 124px minmax(150px, 1fr);
+  align-items: center;
+  border-top: 1px solid var(--c-border-soft);
+}
+.c-budgets .ligne-titres { background: var(--c-bg); }
+.c-budgets .titre { padding: 10px 12px; font-size: 13px; font-weight: 500; color: var(--c-muted); }
+.c-budgets .cellule { padding: 14px 12px; font-size: 14px; min-width: 0; }
+.c-budgets .dept { font-weight: 500; }
+.c-budgets .montant { white-space: nowrap; }
+.c-budgets .restant { font-weight: 500; }
+
+/* La ligne « Total » : fond gris, trait épais, tout en gras */
+.c-budgets .ligne-total { border-top: 2px solid var(--c-border); background: var(--c-bg); }
+.c-budgets .ligne-total .cellule { font-weight: 600; }
+
+/* La petite barre de 10 cases et son pourcentage */
+.c-budgets .taux { display: flex; align-items: center; gap: 8px; }
+.c-budgets .jauge { flex: 1; display: flex; gap: 2px; }
+.c-budgets .case { flex: 1; height: 8px; border-radius: 2px; background: var(--c-step-todo); }
+.c-budgets .case.allumee { background: var(--c-step-done); }
+.c-budgets .pourcent { min-width: 36px; text-align: right; font-size: 13px; font-weight: 500; }
+
+.c-budgets .legende {
+  margin: 0;
+  padding: 14px 24px;
+  border-top: 1px solid var(--c-border-soft);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-muted);
+}

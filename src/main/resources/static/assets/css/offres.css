@@ -1,0 +1,281 @@
+/*
+  Pages publiques des offres d'emploi (bloc 2 — Recrutement).
+  Même principe que les autres fichiers : une classe racine « c-offres »
+  remplace les <style scoped> du projet Vue.
+*/
+
+.c-offres {
+  min-height: 100vh;
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+
+/* Formulaire intégré sous l'en-tête public. */
+.c-offres.embed {
+  min-height: 0;
+  background: transparent;
+}
+
+/* ----- Barre supérieure publique ----- */
+.c-offres .barre-publique {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 32px;
+  background: var(--c-side);
+}
+.c-offres .marque {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-decoration: none;
+}
+.c-offres .marque-titre { font-size: 18px; font-weight: 600; color: #fff; }
+.c-offres .marque-sous-titre { font-size: 13px; color: var(--c-side-muted); }
+.c-offres .lien-espace {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--c-side-ring);
+  border-radius: var(--r-ctl);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.c-offres .lien-espace:hover { background: var(--c-side-active); color: #fff; }
+
+/* ----- Contenu ----- */
+.c-offres .contenu-public {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: 40px 24px 56px;
+}
+.c-offres .hero { margin-bottom: 28px; }
+.c-offres .hero .surtitre {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.c-offres .hero h1 { margin: 6px 0 0; font-size: 34px; line-height: 1.15; font-weight: 600; }
+.c-offres .hero .intro { margin: 10px 0 0; max-width: 640px; font-size: 16px; line-height: 1.55; color: var(--c-muted); }
+
+/* ----- Bandeau d'erreur ----- */
+.c-offres .bandeau-erreur {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: var(--r-card);
+  background: var(--chip-red-bg);
+  color: var(--chip-red-fg);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.c-offres .bandeau-succes {
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border-radius: var(--r-card);
+  background: var(--c-ok-soft);
+  color: var(--c-ok);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ----- Liste des offres ----- */
+.c-offres .grille-offres {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+.c-offres .offre-carte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 24px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  background: var(--c-surface);
+}
+.c-offres .offre-entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.c-offres .offre-date { font-size: 13px; color: var(--c-muted); }
+.c-offres .offre-carte h2 { margin: 0; font-size: 20px; line-height: 1.3; font-weight: 600; }
+.c-offres .offre-meta { margin: 0; font-size: 14px; color: var(--c-ink-2); }
+.c-offres .offre-extrait {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-muted);
+  white-space: pre-line;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.c-offres .bouton-offre {
+  align-self: flex-start;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  background: var(--c-accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.c-offres .bouton-offre:hover { background: var(--c-accent-dark); color: #fff; }
+
+/* ----- Aucune offre ----- */
+.c-offres .carte-vide {
+  padding: 44px 28px;
+  border: 1px dashed var(--c-border);
+  border-radius: var(--r-card);
+  background: var(--c-surface);
+  text-align: center;
+}
+.c-offres .carte-vide h2 { margin: 0; font-size: 22px; font-weight: 600; }
+.c-offres .carte-vide p { margin: 8px 0 0; font-size: 15px; color: var(--c-muted); }
+
+/* ----- Détail d'une offre ----- */
+.c-offres .retour {
+  display: inline-flex;
+  margin-bottom: 18px;
+  font-size: 14px;
+  color: var(--c-accent);
+  text-decoration: none;
+}
+.c-offres .retour:hover { color: var(--c-accent-dark); text-decoration: underline; }
+.c-offres .carte-offre {
+  padding: 32px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  background: var(--c-surface);
+}
+.c-offres .carte-offre h1 { margin: 10px 0 0; font-size: 30px; line-height: 1.2; font-weight: 600; }
+.c-offres .carte-offre .offre-meta { margin-top: 8px; }
+.c-offres .offre-description {
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--c-border-soft);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--c-ink-2);
+  white-space: pre-line;
+}
+.c-offres .postuler {
+  margin-top: 26px;
+  padding: 22px 24px;
+  border: 1px solid var(--c-info-line);
+  border-radius: var(--r-card);
+  background: var(--c-accent-soft);
+}
+.c-offres .postuler h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.c-offres .postuler p { margin: 8px 0 14px; font-size: 15px; line-height: 1.55; color: var(--c-ink-2); }
+
+/* ----- Formulaire de candidature ----- */
+.c-offres .carte-offre > .bandeau-erreur { margin: 18px 0 0; }
+.c-offres .form-candidature {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+}
+.c-offres .form-candidature fieldset {
+  margin: 0;
+  padding: 20px 22px 6px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+}
+.c-offres .form-candidature legend {
+  padding: 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.c-offres .grille-champs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0 16px;
+}
+.c-offres .champ-ligne {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.c-offres .champ-ligne > label,
+.c-offres .champ-ligne > .etiquette { font-size: 13px; font-weight: 600; }
+.c-offres .obligatoire { color: var(--c-danger); }
+.c-offres .facultatif { font-size: 12px; font-weight: 400; color: var(--c-muted); }
+.c-offres .champ {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--c-field);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+.c-offres .champ:focus { outline: 2px solid var(--c-accent); outline-offset: 1px; }
+.c-offres .champ[readonly] { background: #f1f5f9; color: var(--c-ink-2); }
+.c-offres .champ-court { max-width: 160px; }
+.c-offres .note-profil {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--c-muted);
+}
+.c-offres textarea.champ { min-height: 96px; resize: vertical; }
+.c-offres .choix-groupe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 2px 0;
+}
+.c-offres .choix {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.c-offres .actions-formulaire {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.c-offres .retour-lien { font-size: 14px; color: var(--c-muted); text-decoration: none; }
+.c-offres .retour-lien:hover { color: var(--c-accent); text-decoration: underline; }
+
+/* ----- Pied de page ----- */
+.c-offres .pied-public {
+  padding: 22px 32px 32px;
+  border-top: 1px solid var(--c-border-soft);
+  font-size: 13px;
+  color: var(--c-muted);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .c-offres .barre-publique { padding: 16px 20px; }
+  .c-offres .contenu-public { padding: 28px 16px 40px; }
+  .c-offres .hero h1 { font-size: 28px; }
+  .c-offres .carte-offre { padding: 22px 20px; }
+  .c-offres .carte-offre h1 { font-size: 24px; }
+}

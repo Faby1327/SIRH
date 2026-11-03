@@ -1,0 +1,272 @@
+/*
+  Styles de l'espace « Besoins en personnel » (migration du front Vue vers JSP).
+
+  Dans le projet Vue, chaque composant avait son bloc <style scoped> : ses règles ne touchaient que ses
+  propres éléments. Le CSS classique n'a pas cette protection, et des classes comme .bouton ou .carte
+  ont des règles différentes selon l'écran. Chaque bloc est donc précédé d'une classe « racine » posée sur
+  l'élément de plus haut niveau de la page ou du composant (c-espace, c-login, c-introuvable…).
+  Les valeurs sont celles du projet Vue, sans changement.
+*/
+
+/* Un élément « hidden » disparaît toujours, même si sa classe lui donne un display (flex, grid…) */
+[hidden] { display: none !important; }
+
+/* ===== Texte réservé aux lecteurs d'écran (visible seulement pour eux) ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== Layout des espaces (EspaceLayout.vue) ===== */
+.c-espace { display: flex; flex-wrap: wrap; min-height: 100vh; background: var(--c-bg); }
+
+/* ----- Barre latérale ----- */
+.c-espace > .barre {
+  flex: 1 1 248px;
+  max-width: 100%;
+  background: var(--c-side);
+  color: var(--c-side-text);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.c-espace > .barre .marque { display: flex; flex-direction: column; gap: 4px; padding: 0 8px; }
+.c-espace > .barre .marque-titre { font-size: 17px; font-weight: 600; color: #fff; }
+.c-espace > .barre .marque-sous-titre { font-size: 13px; color: var(--c-side-muted); }
+
+.c-espace > .barre .menu { display: flex; flex-direction: column; gap: 4px; }
+.c-espace > .barre .lien {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--c-side-text);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.c-espace > .barre .lien.actif { background: var(--c-side-active); color: #fff; }
+
+/* Pastille jaune : nombre de demandes à vérifier */
+.c-espace > .barre .pastille {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--c-badge);
+  color: var(--c-badge-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.c-espace > .barre .bas { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+.c-espace > .barre .profil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--c-side-card);
+}
+.c-espace > .barre .avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-avatar);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.c-espace > .barre .profil-nom { font-size: 14px; font-weight: 600; color: #fff; }
+.c-espace > .barre .profil-detail { font-size: 13px; color: var(--c-side-muted); }
+.c-espace > .barre .deconnexion {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  margin-top: 4px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--c-side-text);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* ----- Zone principale ----- */
+.c-espace > .contenu { flex: 999 1 560px; min-width: 0; }
+
+/* ===== Page de connexion (LoginView.vue) ===== */
+.c-login { display: flex; flex-wrap: wrap; min-height: 100vh; background: var(--c-bg); }
+
+/* ----- Panneau de gauche ----- */
+.c-login .presentation {
+  flex: 1 1 420px;
+  background: var(--c-side);
+  color: var(--c-side-text);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+}
+.c-login .marque { display: flex; flex-direction: column; gap: 6px; }
+.c-login .marque-titre { font-size: 28px; line-height: 1.2; font-weight: 600; color: #fff; }
+.c-login .marque-sous-titre { font-size: 15px; color: var(--c-side-muted); }
+
+.c-login .circuit { display: flex; flex-direction: column; gap: 24px; }
+.c-login .circuit h2 { margin: 0; font-size: 18px; font-weight: 600; color: #fff; }
+.c-login ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 20px; }
+.c-login li { display: flex; gap: 14px; align-items: flex-start; }
+.c-login .numero {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--c-side-ring);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.c-login .etape-titre { font-size: 16px; font-weight: 600; color: #fff; }
+.c-login .etape-texte { font-size: 14px; color: var(--c-side-muted); }
+.c-login .note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--c-side-muted); }
+
+/* ----- Colonne de droite ----- */
+.c-login .formulaire {
+  flex: 1 1 480px;
+  padding: 48px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.c-login .carte {
+  width: 100%;
+  max-width: 440px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.c-login .carte h1 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; }
+.c-login .intro { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: var(--c-muted); }
+
+.c-login .champs { display: flex; flex-direction: column; gap: 16px; }
+.c-login label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+.c-login input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--c-field);
+  border-radius: var(--r-ctl);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 15px;
+}
+.c-login .bouton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--r-ctl);
+  background: var(--c-accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.c-login .comptes {
+  border-top: 1px solid var(--c-border-soft);
+  padding-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.c-login .comptes h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.c-login .comptes p { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: var(--c-muted); }
+.c-login table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.c-login th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-muted);
+  background: var(--c-bg);
+}
+.c-login td { padding: 9px 10px; border-top: 1px solid var(--c-border-soft); }
+.c-login .code { font-family: var(--font-mono); font-size: 13px; }
+.c-login .lien-offres { margin: 18px 0 0; font-size: 14px; font-weight: 500; }
+.c-login .erreur {
+  padding: 12px 14px;
+  border-radius: var(--r-ctl);
+  background: var(--chip-red-bg);
+  color: var(--chip-red-fg);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ===== Page introuvable (NotFoundView.vue) ===== */
+.c-introuvable {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-bg);
+}
+.c-introuvable .carte {
+  width: 100%;
+  max-width: 440px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.c-introuvable .code { margin: 0; font-size: 14px; font-weight: 600; color: var(--c-muted); }
+.c-introuvable h1 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; }
+.c-introuvable .texte { margin: 0; font-size: 15px; line-height: 1.5; color: var(--c-muted); }
+.c-introuvable .bouton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: var(--r-ctl);
+  background: var(--c-accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.c-introuvable .bouton:hover { background: var(--c-accent-dark); color: #fff; }
