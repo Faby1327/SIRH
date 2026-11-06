@@ -544,6 +544,187 @@ CREATE TABLE IF NOT EXISTS paiement_salaire (
     CONSTRAINT ck_paiement_statut CHECK (statut IN ('EFFECTUE', 'ECHEC', 'ANNULE'))
 );
 
+-- ================================================================
+-- Bloc 6 : planning, temps de travail et missions
+-- ================================================================
+
+CREATE TABLE IF NOT EXISTS regime_travail (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    heures_hebdomadaires NUMERIC(5,2) NOT NULL CHECK (heures_hebdomadaires > 0 AND heures_hebdomadaires <= 168),
+    jours_travailles_par_semaine INT NOT NULL CHECK (jours_travailles_par_semaine BETWEEN 1 AND 7),
+    actif BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS modele_horaire (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL UNIQUE,
+    heure_debut TIME NOT NULL,
+    heure_fin TIME NOT NULL,
+    pause_prevue_minutes INT NOT NULL DEFAULT 0 CHECK (pause_prevue_minutes BETWEEN 0 AND 1440),
+    tolerance_retard_minutes INT NOT NULL DEFAULT 0 CHECK (tolerance_retard_minutes >= 0),
+    actif BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT ck_modele_horaire_heures CHECK (heure_fin > heure_debut)
+);
+
+CREATE TABLE IF NOT EXISTS affectation_horaire (
+    id SERIAL PRIMARY KEY,
+    employe_id INT NOT NULL,
+    regime_travail_id INT NOT NULL,
+    modele_horaire_id INT NOT NULL,
+    date_debut DATE NOT NULL,
+    date_fin DATE,
+    actif BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_affectation_horaire_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT fk_affectation_horaire_regime FOREIGN KEY (regime_travail_id) REFERENCES regime_travail(id),
+    CONSTRAINT fk_affectation_horaire_modele FOREIGN KEY (modele_horaire_id) REFERENCES modele_horaire(id),
+    CONSTRAINT ck_affectation_horaire_dates CHECK (date_fin IS NULL OR date_fin >= date_debut)
+);
+
+-- Convention : 1 = lundi, ..., 7 = dimanche.
+CREATE TABLE IF NOT EXISTS affectation_horaire_jour (
+    affectation_horaire_id INT NOT NULL,
+    jour_semaine INT NOT NULL CHECK (jour_semaine BETWEEN 1 AND 7),
+    PRIMARY KEY (affectation_horaire_id, jour_semaine),
+    CONSTRAINT fk_affectation_jour_affectation FOREIGN KEY (affectation_horaire_id)
+        REFERENCES affectation_horaire(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS jour_travail (
+    id SERIAL PRIMARY KEY,
+    employe_id INT NOT NULL,
+    contrat_id INT,
+    affectation_horaire_id INT,
+    date_travail DATE NOT NULL,
+    heure_debut_prevue TIME,
+    heure_fin_prevue TIME,
+    pause_prevue_minutes INT NOT NULL DEFAULT 0 CHECK (pause_prevue_minutes >= 0),
+    heure_entree_reelle TIME,
+    heure_sortie_reelle TIME,
+    minutes_travaillees INT CHECK (minutes_travaillees IS NULL OR minutes_travaillees >= 0),
+    minutes_retard INT NOT NULL DEFAULT 0 CHECK (minutes_retard >= 0),
+    minutes_supplementaires INT NOT NULL DEFAULT 0 CHECK (minutes_supplementaires >= 0),
+    statut VARCHAR(25) NOT NULL DEFAULT 'PLANIFIEE',
+    commentaire TEXT,
+    CONSTRAINT fk_jour_travail_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT fk_jour_travail_contrat FOREIGN KEY (contrat_id) REFERENCES contrat(id),
+    CONSTRAINT fk_jour_travail_affectation FOREIGN KEY (affectation_horaire_id) REFERENCES affectation_horaire(id),
+    CONSTRAINT uq_jour_travail_employe_date UNIQUE (employe_id, date_travail),
+    CONSTRAINT ck_jour_travail_statut CHECK (statut IN ('PLANIFIEE', 'EN_COURS', 'A_VERIFIER', 'VALIDEE', 'ABSENCE')),
+    CONSTRAINT ck_jour_travail_heures_reelles CHECK (heure_sortie_reelle IS NULL OR heure_entree_reelle IS NULL OR heure_sortie_reelle >= heure_entree_reelle),
+    CONSTRAINT ck_jour_travail_heures_prevues CHECK (heure_fin_prevue IS NULL OR heure_debut_prevue IS NULL OR heure_fin_prevue > heure_debut_prevue)
+);
+
+CREATE TABLE IF NOT EXISTS anomalie_temps (
+    id SERIAL PRIMARY KEY,
+    jour_travail_id INT NOT NULL,
+    employe_id INT NOT NULL,
+    type_anomalie VARCHAR(30) NOT NULL,
+    description TEXT NOT NULL,
+    justification TEXT,
+    statut VARCHAR(20) NOT NULL DEFAULT 'EN_ATTENTE',
+    verificateur_id INT,
+    date_detection TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_verification TIMESTAMP,
+    CONSTRAINT fk_anomalie_jour_travail FOREIGN KEY (jour_travail_id) REFERENCES jour_travail(id) ON DELETE CASCADE,
+    CONSTRAINT fk_anomalie_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT fk_anomalie_verificateur FOREIGN KEY (verificateur_id) REFERENCES utilisateur(id),
+    CONSTRAINT ck_anomalie_type CHECK (type_anomalie IN ('ENTREE_TARDIVE', 'SORTIE_ANTICIPEE', 'ABSENCE', 'ENTREE_MANQUANTE', 'SORTIE_MANQUANTE', 'TEMPS_INSUFFISANT', 'HORAIRES_INCOHERENTS')),
+    CONSTRAINT ck_anomalie_statut CHECK (statut IN ('EN_ATTENTE', 'JUSTIFIEE', 'APPROUVEE', 'REFUSEE'))
+);
+
+CREATE TABLE IF NOT EXISTS absence (
+    id SERIAL PRIMARY KEY,
+    employe_id INT NOT NULL,
+    date_debut DATE NOT NULL,
+    date_fin DATE NOT NULL,
+    type_absence VARCHAR(30) NOT NULL,
+    motif TEXT,
+    statut VARCHAR(20) NOT NULL DEFAULT 'DEMANDEE',
+    valide_par INT,
+    date_demande TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_validation TIMESTAMP,
+    CONSTRAINT fk_absence_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT fk_absence_validateur FOREIGN KEY (valide_par) REFERENCES utilisateur(id),
+    CONSTRAINT ck_absence_dates CHECK (date_fin >= date_debut),
+    CONSTRAINT ck_absence_type CHECK (type_absence IN ('CONGE', 'MALADIE', 'AUTORISATION', 'ABSENCE_INJUSTIFIEE', 'AUTRE')),
+    CONSTRAINT ck_absence_statut CHECK (statut IN ('DEMANDEE', 'VALIDEE', 'REFUSEE', 'ANNULEE'))
+);
+
+CREATE TABLE IF NOT EXISTS mission (
+    id SERIAL PRIMARY KEY,
+    titre VARCHAR(200) NOT NULL,
+    description TEXT,
+    date_debut DATE NOT NULL,
+    date_fin_prevue DATE,
+    date_fin_reelle DATE,
+    lieu VARCHAR(250),
+    priorite VARCHAR(15) NOT NULL DEFAULT 'NORMALE',
+    responsable_id INT NOT NULL,
+    statut VARCHAR(20) NOT NULL DEFAULT 'A_FAIRE',
+    CONSTRAINT fk_mission_responsable FOREIGN KEY (responsable_id) REFERENCES utilisateur(id),
+    CONSTRAINT ck_mission_dates CHECK (date_fin_prevue IS NULL OR date_fin_prevue >= date_debut),
+    CONSTRAINT ck_mission_date_fin_reelle CHECK (date_fin_reelle IS NULL OR date_fin_reelle >= date_debut),
+    CONSTRAINT ck_mission_priorite CHECK (priorite IN ('BASSE', 'NORMALE', 'HAUTE', 'URGENTE')),
+    CONSTRAINT ck_mission_statut CHECK (statut IN ('A_FAIRE', 'EN_COURS', 'TERMINEE', 'ANNULEE'))
+);
+
+CREATE TABLE IF NOT EXISTS participation_mission (
+    id SERIAL PRIMARY KEY,
+    mission_id INT NOT NULL,
+    employe_id INT NOT NULL,
+    role VARCHAR(100) NOT NULL,
+    date_affectation DATE NOT NULL DEFAULT CURRENT_DATE,
+    avancement INT NOT NULL DEFAULT 0 CHECK (avancement BETWEEN 0 AND 100),
+    statut VARCHAR(20) NOT NULL DEFAULT 'AFFECTEE',
+    date_fin_reelle DATE,
+    compte_rendu TEXT,
+    CONSTRAINT fk_participation_mission FOREIGN KEY (mission_id) REFERENCES mission(id) ON DELETE CASCADE,
+    CONSTRAINT fk_participation_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT uq_participation_mission_employe UNIQUE (mission_id, employe_id),
+    CONSTRAINT ck_participation_statut CHECK (statut IN ('AFFECTEE', 'EN_COURS', 'TERMINEE', 'ANNULEE'))
+);
+
+-- Chronologie détaillée d'une journée : mission, pause, réunion, etc.
+CREATE TABLE IF NOT EXISTS detail_jour_travail (
+    id SERIAL PRIMARY KEY,
+    jour_travail_id INT NOT NULL,
+    participation_mission_id INT,
+    type_detail VARCHAR(20) NOT NULL,
+    heure_debut TIME NOT NULL,
+    heure_fin TIME NOT NULL,
+    nombre_minutes INT NOT NULL CHECK (nombre_minutes > 0),
+    description TEXT,
+    statut VARCHAR(20) NOT NULL DEFAULT 'A_VERIFIER',
+    CONSTRAINT fk_detail_jour_travail FOREIGN KEY (jour_travail_id) REFERENCES jour_travail(id) ON DELETE CASCADE,
+    CONSTRAINT fk_detail_participation_mission FOREIGN KEY (participation_mission_id) REFERENCES participation_mission(id),
+    CONSTRAINT ck_detail_type CHECK (type_detail IN ('MISSION', 'PAUSE', 'REUNION', 'FORMATION', 'TACHE_INTERNE', 'AUTRE')),
+    CONSTRAINT ck_detail_heures CHECK (heure_fin > heure_debut),
+    CONSTRAINT ck_detail_mission CHECK ((type_detail = 'MISSION' AND participation_mission_id IS NOT NULL) OR (type_detail <> 'MISSION' AND participation_mission_id IS NULL)),
+    CONSTRAINT ck_detail_statut CHECK (statut IN ('A_VERIFIER', 'VALIDE', 'REFUSE'))
+);
+
+CREATE TABLE IF NOT EXISTS heure_supplementaire (
+    id SERIAL PRIMARY KEY,
+    jour_travail_id INT NOT NULL,
+    employe_id INT NOT NULL,
+    date_travail DATE NOT NULL,
+    heure_debut TIME NOT NULL,
+    heure_fin TIME NOT NULL,
+    nombre_minutes INT NOT NULL CHECK (nombre_minutes > 0),
+    motif TEXT NOT NULL,
+    statut VARCHAR(20) NOT NULL DEFAULT 'DEMANDEE',
+    manager_id INT NOT NULL,
+    date_demande TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_validation TIMESTAMP,
+    CONSTRAINT fk_heure_supp_jour_travail FOREIGN KEY (jour_travail_id) REFERENCES jour_travail(id) ON DELETE CASCADE,
+    CONSTRAINT fk_heure_supp_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT fk_heure_supp_manager FOREIGN KEY (manager_id) REFERENCES utilisateur(id),
+    CONSTRAINT ck_heure_supp_heures CHECK (heure_fin > heure_debut),
+    CONSTRAINT ck_heure_supp_statut CHECK (statut IN ('DEMANDEE', 'VALIDEE', 'REFUSEE', 'ANNULEE'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_poste_departement ON poste(departement_id);
 CREATE INDEX IF NOT EXISTS idx_utilisateur_role ON utilisateur(role_id);
 CREATE INDEX IF NOT EXISTS idx_utilisateur_departement ON utilisateur(departement_id);
@@ -577,3 +758,20 @@ CREATE INDEX IF NOT EXISTS idx_fiche_paie_periode ON fiche_paie(annee, mois);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_statut ON fiche_paie(statut);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_employe ON fiche_paie(employe_id);
 CREATE INDEX IF NOT EXISTS idx_paiement_salaire_date ON paiement_salaire(date_paiement);
+CREATE INDEX IF NOT EXISTS idx_affectation_horaire_employe ON affectation_horaire(employe_id);
+CREATE INDEX IF NOT EXISTS idx_affectation_horaire_periode ON affectation_horaire(date_debut, date_fin);
+CREATE INDEX IF NOT EXISTS idx_jour_travail_date ON jour_travail(date_travail);
+CREATE INDEX IF NOT EXISTS idx_jour_travail_employe_date ON jour_travail(employe_id, date_travail);
+CREATE INDEX IF NOT EXISTS idx_jour_travail_statut ON jour_travail(statut);
+CREATE INDEX IF NOT EXISTS idx_anomalie_temps_statut ON anomalie_temps(statut);
+CREATE INDEX IF NOT EXISTS idx_anomalie_temps_employe ON anomalie_temps(employe_id);
+CREATE INDEX IF NOT EXISTS idx_absence_employe_dates ON absence(employe_id, date_debut, date_fin);
+CREATE INDEX IF NOT EXISTS idx_absence_statut ON absence(statut);
+CREATE INDEX IF NOT EXISTS idx_mission_statut ON mission(statut);
+CREATE INDEX IF NOT EXISTS idx_mission_responsable ON mission(responsable_id);
+CREATE INDEX IF NOT EXISTS idx_participation_mission ON participation_mission(mission_id);
+CREATE INDEX IF NOT EXISTS idx_participation_employe ON participation_mission(employe_id);
+CREATE INDEX IF NOT EXISTS idx_detail_jour_travail ON detail_jour_travail(jour_travail_id);
+CREATE INDEX IF NOT EXISTS idx_detail_participation ON detail_jour_travail(participation_mission_id);
+CREATE INDEX IF NOT EXISTS idx_heure_supp_statut ON heure_supplementaire(statut);
+CREATE INDEX IF NOT EXISTS idx_heure_supp_employe_date ON heure_supplementaire(employe_id, date_travail);
