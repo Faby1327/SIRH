@@ -577,3 +577,68 @@ CREATE INDEX IF NOT EXISTS idx_fiche_paie_periode ON fiche_paie(annee, mois);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_statut ON fiche_paie(statut);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_employe ON fiche_paie(employe_id);
 CREATE INDEX IF NOT EXISTS idx_paiement_salaire_date ON paiement_salaire(date_paiement);
+
+-- ============================================================
+-- BLOC 5 - Historique et journal d'audit
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS type_action (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(30) NOT NULL UNIQUE,
+    libelle VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS type_entite (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(30) NOT NULL UNIQUE,
+    libelle VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS historique_employe (
+    id SERIAL PRIMARY KEY,
+    employe_id INT NOT NULL REFERENCES employe(id),
+    poste_id INT NOT NULL REFERENCES poste(id),
+    departement_id INT NOT NULL REFERENCES departement(id),
+    superieur_id INT REFERENCES employe(id),
+    salaire NUMERIC(12,2) NOT NULL CHECK (salaire >= 0),
+    date_effet DATE NOT NULL,
+    date_enregistrement TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT ck_hist_employe_superieur
+        CHECK (superieur_id IS NULL OR superieur_id <> employe_id)
+);
+
+CREATE TABLE IF NOT EXISTS historique_situation_personnelle (
+    id SERIAL PRIMARY KEY,
+    employe_id INT NOT NULL REFERENCES employe(id),
+    telephone VARCHAR(30),
+    email_personnel VARCHAR(150),
+    adresse VARCHAR(255),
+    commune VARCHAR(100),
+    region VARCHAR(100),
+    situation_matrimoniale VARCHAR(30),
+    nombre_enfants INT CHECK (nombre_enfants IS NULL OR nombre_enfants >= 0),
+    contact_urgence_nom VARCHAR(150),
+    contact_urgence_relation VARCHAR(50),
+    contact_urgence_telephone VARCHAR(30),
+    date_effet DATE NOT NULL,
+    date_enregistrement TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- entite_id est polymorphe : type_entite_id dit de quelle table il s'agit.
+-- Pas de cle etrangere possible, la coherence est controlee par AuditService.
+CREATE TABLE IF NOT EXISTS journal_audit (
+    id BIGSERIAL PRIMARY KEY,
+    utilisateur_id INT NOT NULL REFERENCES utilisateur(id),
+    action_id INT NOT NULL REFERENCES type_action(id),
+    entite_id INT NOT NULL,
+    type_entite_id INT NOT NULL REFERENCES type_entite(id),
+    date_action TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    anciennes_valeurs TEXT,
+    nouvelles_valeurs TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_hist_employe ON historique_employe(employe_id, date_effet);
+CREATE INDEX IF NOT EXISTS idx_hist_situation ON historique_situation_personnelle(employe_id, date_effet);
+CREATE INDEX IF NOT EXISTS idx_audit_date ON journal_audit(date_action);
+CREATE INDEX IF NOT EXISTS idx_audit_utilisateur ON journal_audit(utilisateur_id);
+CREATE INDEX IF NOT EXISTS idx_audit_entite ON journal_audit(type_entite_id, entite_id);
