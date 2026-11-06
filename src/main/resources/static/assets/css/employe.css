@@ -38,6 +38,7 @@ body { margin: 0; color: #17263a; background: #f3f6fa; font-family: 'IBM Plex Sa
 .status { display: inline-flex; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
 .status-PLANIFIEE { background: #edf0f4; color: #586577; }
 .status-VALIDEE { background: #ddf2e4; color: #176b38; }
+.status-ABSENCE { background: #fde4e1; color: #9a2e25; }
 .status-A_VERIFIER { background: #fff0c9; color: #805c11; }
 .action-button, .edit-row button { min-height: 36px; padding: 0 12px; border: 1px solid #cbd5e3; border-radius: 8px; background: #fff; color: #315b9d; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .action-button:hover, .edit-row button:hover { background: #eef3fa; }

@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.logiciel_RH.entity.AffectationHoraire;
+import com.example.logiciel_RH.entity.Absence;
 import com.example.logiciel_RH.entity.Contrat;
 import com.example.logiciel_RH.entity.JourTravail;
 import com.example.logiciel_RH.repository.AffectationHoraireRepository;
+import com.example.logiciel_RH.repository.AbsenceRepository;
 import com.example.logiciel_RH.repository.ContratRepository;
 import com.example.logiciel_RH.repository.JourTravailRepository;
 
@@ -21,13 +23,16 @@ public class PlanningJourService {
     private final AffectationHoraireRepository affectationRepository;
     private final JourTravailRepository jourRepository;
     private final ContratRepository contratRepository;
+    private final AbsenceRepository absenceRepository;
 
     public PlanningJourService(AffectationHoraireRepository affectationRepository,
                                JourTravailRepository jourRepository,
-                               ContratRepository contratRepository) {
+                               ContratRepository contratRepository,
+                               AbsenceRepository absenceRepository) {
         this.affectationRepository = affectationRepository;
         this.jourRepository = jourRepository;
         this.contratRepository = contratRepository;
+        this.absenceRepository = absenceRepository;
     }
 
     @Transactional
@@ -51,7 +56,23 @@ public class PlanningJourService {
 
             for (LocalDate date = debut; !date.isAfter(fin); date = date.plusDays(1)) {
                 if (!affectation.getJoursSemaine().contains(date.getDayOfWeek().getValue())) continue;
-                if (jourRepository.findByEmploye_IdAndDateTravail(affectation.getEmploye().getId(), date).isPresent()) continue;
+                boolean absenceValidee = absenceRepository.estAbsent(
+                        affectation.getEmploye().getId(), date, Absence.Statut.VALIDEE);
+                var jourExistant = jourRepository.findByEmploye_IdAndDateTravail(
+                        affectation.getEmploye().getId(), date);
+                if (absenceValidee) {
+                    jourExistant.ifPresent(jour -> {
+                        if (!"POINTAGE_VALIDE".equals(jour.getStatut())
+                                && !"VALIDEE".equals(jour.getStatut())) {
+                            jour.setStatut("ABSENCE");
+                            jour.setHeureEntreeReelle(null);
+                            jour.setHeureSortieReelle(null);
+                            jourRepository.save(jour);
+                        }
+                    });
+                    continue;
+                }
+                if (jourExistant.isPresent()) continue;
 
                 JourTravail jour = new JourTravail();
                 jour.setEmploye(affectation.getEmploye());
@@ -74,7 +95,8 @@ public class PlanningJourService {
                 .orElseThrow(() -> new IllegalArgumentException("Journée de travail introuvable."));
         if ("POINTAGE_VALIDE".equals(jour.getStatut())
                 || "DETAIL_A_VERIFIER".equals(jour.getStatut())
-                || "VALIDEE".equals(jour.getStatut())) {
+                || "VALIDEE".equals(jour.getStatut())
+                || "ABSENCE".equals(jour.getStatut())) {
             throw new IllegalArgumentException("Le pointage de cette journée a déjà été validé par les RH.");
         }
         if (entree == null || sortie == null) throw new IllegalArgumentException("Les deux heures sont obligatoires.");

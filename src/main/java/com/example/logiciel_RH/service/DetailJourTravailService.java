@@ -41,8 +41,8 @@ public class DetailJourTravailService {
         if (!jour.getEmploye().getId().equals(employeId)) {
             throw new IllegalArgumentException("Cette journée n'appartient pas à cet employé.");
         }
-        if ("VALIDEE".equals(jour.getStatut())) {
-            throw new IllegalArgumentException("Cette journée est déjà validée.");
+        if ("VALIDEE".equals(jour.getStatut()) || "ABSENCE".equals(jour.getStatut())) {
+            throw new IllegalArgumentException("Cette journée est marquée comme absence et ne peut pas recevoir de détail.");
         }
         if (debut == null || fin == null || !fin.isAfter(debut)) {
             throw new IllegalArgumentException("Les horaires du détail sont invalides.");

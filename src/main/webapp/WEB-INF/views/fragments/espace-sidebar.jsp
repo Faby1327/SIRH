@@ -21,6 +21,7 @@
                 <a href="${pageContext.request.contextPath}/rh/paie" class="lien ${param.active == 'paie' ? 'actif' : ''}">Fiches de paie</a>
                 <a href="${pageContext.request.contextPath}/rh/planning/affectations" class="lien ${param.active == 'planning' ? 'actif' : ''}">Affectations horaires</a>
                 <a href="${pageContext.request.contextPath}/rh/planning/jours" class="lien ${param.active == 'jours' ? 'actif' : ''}">Jours de travail</a>
+                <a href="${pageContext.request.contextPath}/rh/absences" class="lien ${param.active == 'absences' ? 'actif' : ''}">Absences</a>
                 <a href="${pageContext.request.contextPath}/rh/missions" class="lien ${param.active == 'missions' ? 'actif' : ''}">Missions</a>
             </c:when>
             <c:when test="${param.role == 'finance'}">
