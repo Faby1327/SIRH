@@ -20,6 +20,7 @@ import com.example.logiciel_RH.repository.ContratRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
 import com.example.logiciel_RH.repository.PosteRepository;
 import com.example.logiciel_RH.service.AuditService;
+import com.example.logiciel_RH.service.HistoriqueService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,15 +31,18 @@ public class EmployeController {
     private final ContratRepository contratRepository;
     private final PosteRepository posteRepository;
     private final AuditService auditService;
+    private final HistoriqueService historiqueService;
 
     public EmployeController(EmployeRepository employeRepository,
                              ContratRepository contratRepository,
                              PosteRepository posteRepository,
-                             AuditService auditService) {
+                             AuditService auditService,
+                             HistoriqueService historiqueService) {
         this.employeRepository = employeRepository;
         this.contratRepository = contratRepository;
         this.posteRepository = posteRepository;
         this.auditService = auditService;
+        this.historiqueService = historiqueService;
     }
 
     @GetMapping
@@ -114,9 +118,15 @@ public class EmployeController {
                 throw new IllegalArgumentException("La date de fin doit être postérieure à la date de début.");
 
             for (Contrat precedent : contratRepository.findByEmploye_IdAndStatut(id, Contrat.Statut.EN_COURS)) {
+                Contrat.Statut ancienStatutContrat = precedent.getStatut();
+                LocalDate ancienneFinContrat = precedent.getDateFin();
                 precedent.setStatut(Contrat.Statut.TERMINE);
                 precedent.setDateFin(debut.minusDays(1));
                 contratRepository.save(precedent);
+                auditService.enregistrer(SessionUtils.getUtilisateur(session),
+                        AuditService.UPDATE, AuditService.CONTRAT, precedent.getId(),
+                        AuditService.valeurs("statut", ancienStatutContrat, "dateFin", ancienneFinContrat),
+                        AuditService.valeurs("statut", precedent.getStatut(), "dateFin", precedent.getDateFin()));
             }
             Contrat contrat = new Contrat();
             contrat.setEmploye(employe);
@@ -128,6 +138,12 @@ public class EmployeController {
             contrat.setDevise("Ar");
             contrat.setStatut(Contrat.Statut.EN_COURS);
             contratRepository.save(contrat);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session),
+                    AuditService.INSERT, AuditService.CONTRAT, contrat.getId(),
+                    null,
+                    AuditService.valeurs("poste", poste.getIntitule(), "typeContrat", contrat.getTypeContrat(),
+                            "dateDebut", debut, "dateFin", fin, "salaireMensuel", salaireMensuel));
+            historiqueService.enregistrerChangementProfessionnel(employe, poste, salaireMensuel, debut);
             employe.setStatut(Employe.Statut.ACTIF);
             employe.setDateFin(null);
             employeRepository.save(employe);
@@ -149,9 +165,15 @@ public class EmployeController {
                     .orElseThrow(() -> new IllegalArgumentException("Contrat introuvable."));
             if (contrat.getEmploye() == null || !employeId.equals(contrat.getEmploye().getId()))
                 throw new IllegalArgumentException("Contrat non associé à cet employé.");
+            Contrat.Statut ancienStatutContrat = contrat.getStatut();
+            LocalDate ancienneFinContrat = contrat.getDateFin();
             contrat.setStatut(Contrat.Statut.TERMINE);
             contrat.setDateFin(LocalDate.now());
             contratRepository.save(contrat);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session),
+                    AuditService.UPDATE, AuditService.CONTRAT, contratId,
+                    AuditService.valeurs("statut", ancienStatutContrat, "dateFin", ancienneFinContrat),
+                    AuditService.valeurs("statut", contrat.getStatut(), "dateFin", contrat.getDateFin()));
             redirectAttributes.addFlashAttribute("message", "Contrat terminé.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
