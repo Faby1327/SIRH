@@ -19,6 +19,7 @@ import com.example.logiciel_RH.entity.Poste;
 import com.example.logiciel_RH.repository.ContratRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
 import com.example.logiciel_RH.repository.PosteRepository;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -28,13 +29,16 @@ public class EmployeController {
     private final EmployeRepository employeRepository;
     private final ContratRepository contratRepository;
     private final PosteRepository posteRepository;
+    private final AuditService auditService;
 
     public EmployeController(EmployeRepository employeRepository,
                              ContratRepository contratRepository,
-                             PosteRepository posteRepository) {
+                             PosteRepository posteRepository,
+                             AuditService auditService) {
         this.employeRepository = employeRepository;
         this.contratRepository = contratRepository;
         this.posteRepository = posteRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping
@@ -55,6 +59,8 @@ public class EmployeController {
             return "redirect:/rh/employes";
         }
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
+        auditService.enregistrer(SessionUtils.getUtilisateur(session),
+                AuditService.CONSULTATION, AuditService.EMPLOYE, id, null, null);
         model.addAttribute("employe", employe);
         model.addAttribute("contrats", contratRepository.findByEmploye_IdOrderByDateDebutDesc(id));
         model.addAttribute("postes", posteRepository.findAll());
@@ -71,9 +77,15 @@ public class EmployeController {
             Employe employe = employeRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Employé introuvable."));
             Employe.Statut nouveauStatut = Employe.Statut.valueOf(statut);
+            Employe.Statut ancienStatut = employe.getStatut();
+            LocalDate ancienneDateFin = employe.getDateFin();
             employe.setStatut(nouveauStatut);
             employe.setDateFin(nouveauStatut == Employe.Statut.SORTI ? LocalDate.now() : null);
             employeRepository.save(employe);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session),
+                    AuditService.UPDATE, AuditService.EMPLOYE, id,
+                    AuditService.valeurs("statut", ancienStatut, "dateFin", ancienneDateFin),
+                    AuditService.valeurs("statut", nouveauStatut, "dateFin", employe.getDateFin()));
             redirectAttributes.addFlashAttribute("message", "Statut de l'employé mis à jour.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
