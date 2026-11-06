@@ -235,6 +235,34 @@
 
 /* ===== Paie ===== */
 .c-planning-page .planning-header { align-items: center; }
+.planning-month-nav { display: flex; align-items: center; gap: 14px; padding: 8px 12px; border: 1px solid #d6e0f3; border-radius: 12px; background: #f1f5fd; color: #31599f; }
+.planning-month-nav a { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; color: #31599f; font-size: 24px; line-height: 1; text-decoration: none; }
+.planning-month-nav a:hover { background: #dce8fb; }
+.planning-edit-row { display: none; background: #f7f9fc; }
+.planning-edit-row.is-visible { display: table-row; }
+.planning-edit-row td { padding: 14px 16px !important; border-top: 1px dashed var(--c-border) !important; }
+.planning-hours-form { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.planning-hours-form > strong { margin-right: auto; color: var(--c-ink); }
+.planning-hours-form label { display: flex; align-items: center; gap: 7px; color: var(--c-muted); font-size: 12px; font-weight: 600; }
+.planning-hours-form .champ { min-height: 38px; padding: 0 9px; border: 1px solid #cbd5e1; border-radius: 7px; background: #fff; color: var(--c-ink); }
+.planning-hours-form .bouton-principal { min-height: 38px; padding: 0 14px; border: 0; border-radius: 8px; background: var(--c-accent); color: #fff; font-weight: 600; cursor: pointer; }
+.planning-inline-form { display: inline-block; margin-left: 6px; }
+.planning-validate { border-color: #b7dcc1 !important; background: #effaf2 !important; color: #176b38 !important; }
+.planning-validate:hover { border-color: #287747 !important; background: #287747 !important; color: #fff !important; }
+.planning-danger { display: block; color: #a33a2e; font-size: 12px; font-weight: 600; }
+.planning-extra { display: block; color: #26734b; font-size: 12px; font-weight: 600; }
+.c-missions-page .table-offres { width: 100%; min-width: 900px; border-collapse: collapse; }
+.c-missions-page .table-offres th { padding: 12px 16px; background: var(--c-bg); color: var(--c-muted); font-size: 11px; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.c-missions-page .table-offres td { padding: 15px 16px; border-top: 1px solid var(--c-border-soft); white-space: nowrap; }
+.mission-priority { display: inline-flex; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.priority-BASSE { background: #edf0f4; color: #586577; }.priority-NORMALE { background: #e8f2ff; color: #1f4e79; }.priority-HAUTE { background: #fff0c9; color: #805c11; }.priority-URGENTE { background: #fde4e1; color: #9a2e25; }
+.mission-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; padding: 24px; }
+.mission-form label, .participant-form label, .mission-status-form label { display: flex; flex-direction: column; gap: 7px; color: var(--c-muted); font-size: 12px; font-weight: 600; }
+.mission-form .champ, .participant-form .champ, .mission-status-form .champ { min-height: 44px; width: 100%; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; color: var(--c-ink); font: inherit; }
+.mission-form textarea.champ { height: auto; padding-top: 11px; resize: vertical; }.mission-description { grid-column: 1 / -1; }.mission-submit { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; }
+.mission-hero { margin-bottom: 20px; }.mission-hero h1 { margin: 4px 0 6px !important; }.mission-status { display: inline-flex; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }.mission-status-A_FAIRE { background: #edf0f4; color: #586577; }.mission-status-EN_COURS { background: #e8f2ff; color: #1f4e79; }.mission-status-TERMINEE { background: #ddf2e4; color: #176b38; }.mission-status-ANNULEE { background: #fde4e1; color: #9a2e25; }
+.mission-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .85fr); gap: 20px; margin-bottom: 20px; }.mission-info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--c-border-soft); }.mission-info > div { display: flex; flex-direction: column; gap: 7px; padding: 17px 20px; background: #fbfcfe; }.mission-info span { color: var(--c-muted); font-size: 12px; }.mission-info strong { color: var(--c-ink-2); font-size: 13px; line-height: 1.45; }.mission-status-form { display: flex; align-items: flex-end; gap: 10px; padding: 18px 20px; border-top: 1px solid var(--c-border-soft); background: #f7f9fc; }.mission-status-form label { flex: 1; }.participant-form { display: grid; gap: 15px; padding: 20px 24px 24px; }.participant-form .bouton-principal { min-height: 42px; border: 0; border-radius: 8px; background: var(--c-accent); color: #fff; font-weight: 600; cursor: pointer; }.mission-progress { width: 120px; height: 7px; overflow: hidden; border-radius: 10px; background: #e3e9f1; }.mission-progress span { display: block; height: 100%; border-radius: inherit; background: var(--c-accent); }.mission-progress + small { color: var(--c-muted); }
+@media (max-width: 900px) { .mission-detail-grid { grid-template-columns: 1fr; } }.mission-form label .champ:focus, .participant-form .champ:focus, .mission-status-form .champ:focus { border-color: var(--c-accent); outline: 0; box-shadow: 0 0 0 3px rgba(49, 89, 159, .14); }
 .planning-header-badge { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #d6e0f3; border-radius: 12px; background: #f1f5fd; color: #31599f; }
 .planning-header-badge span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #dce8fb; font-size: 12px; font-weight: 700; }
 .planning-header-badge strong { font-size: 13px; }

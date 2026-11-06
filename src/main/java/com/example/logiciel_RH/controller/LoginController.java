@@ -60,6 +60,7 @@ public class LoginController {
             case "FINANCIER" -> "/finance/accueil";
             case "DIRECTEUR" -> "/directeur/accueil";
             case "CANDIDAT" -> "/candidat/espace";
+            case "EMPLOYE" -> "/employe/jours";
             default -> "/login";
         };
     }

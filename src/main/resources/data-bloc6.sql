@@ -112,6 +112,13 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
+-- Compte de démonstration de l'employé.
+-- Email : employe.demo@sirh.test
+-- Mot de passe : hash_test_6
+INSERT INTO utilisateur (id, personne_id, mot_de_passe, role_id, departement_id)
+VALUES (6, 6, 'hash_test_6', 6, NULL)
+ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO employe (
     id, personne_id, matricule, date_embauche, statut
 )
@@ -180,6 +187,13 @@ SELECT setval(
     true
 )
 FROM employe;
+
+SELECT setval(
+    pg_get_serial_sequence('utilisateur', 'id'),
+    GREATEST(6, COALESCE(MAX(id), 1)),
+    true
+)
+FROM utilisateur;
 
 SELECT setval(
     pg_get_serial_sequence('contrat', 'id'),

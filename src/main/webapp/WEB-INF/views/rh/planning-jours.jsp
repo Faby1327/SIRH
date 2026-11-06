@@ -1,0 +1,30 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jours de travail - RH</title>
+<link rel="stylesheet" href="${ctx}/assets/css/fonts.css"><link rel="stylesheet" href="${ctx}/assets/css/base.css"><link rel="stylesheet" href="${ctx}/assets/css/besoins.css"><link rel="stylesheet" href="${ctx}/assets/css/composants.css"><link rel="stylesheet" href="${ctx}/assets/css/rh.css?v=20261106-planning-jours">
+</head><body><div class="c-espace">
+<jsp:include page="/WEB-INF/views/fragments/espace-sidebar.jsp"><jsp:param name="role" value="rh"/><jsp:param name="active" value="jours"/></jsp:include>
+<div class="contenu"><main class="page-espace c-page-liste c-annuaire-rh c-planning-page">
+<header class="entete planning-header"><div><p class="surtitre">Organisation du temps de travail</p><h1>Jours de travail</h1><p>Suivez les journées générées depuis les affectations horaires.</p></div><div class="planning-month-nav"><a href="${ctx}/rh/planning/jours?mois=${periodePrecedente}" aria-label="Mois précédent">‹</a><strong><c:out value="${periodeLibelle}"/></strong><a href="${ctx}/rh/planning/jours?mois=${periodeSuivante}" aria-label="Mois suivant">›</a></div></header>
+<c:if test="${not empty message}"><div class="dossier-alert dossier-alert-ok"><c:out value="${message}"/></div></c:if>
+<c:if test="${not empty error}"><div class="dossier-alert dossier-alert-error"><c:out value="${error}"/></div></c:if>
+<section class="carte c-table planning-card"><div class="dossier-card-heading"><div><span class="dossier-icon dossier-icon-blue">01</span><div><h2>Suivi du mois</h2><p><c:out value="${jours.size()}"/> journée(s) planifiée(s)</p></div></div></div>
+<div class="filtres"><div class="recherche"><input type="search" class="champ champ-recherche" placeholder="Rechercher par employé ou matricule…" data-table-search></div><div class="filtre"><label for="jour-statut">Statut</label><select id="jour-statut" class="champ" data-table-filter="statut"><option value="">Tous les statuts</option><option value="PLANIFIEE">Planifiée</option><option value="VALIDEE">Validée</option><option value="A_VERIFIER">À vérifier</option></select></div></div>
+<div class="defilement"><table class="table-offres planning-table"><thead><tr><th>Date</th><th>Employé</th><th>Prévu</th><th>Réel</th><th>Résultat</th><th>Statut</th><th>Action</th></tr></thead><tbody>
+<c:choose><c:when test="${empty jours}"><tr><td colspan="7" class="dossier-empty">Aucune journée planifiée pour cette période.</td></tr></c:when><c:otherwise><c:forEach var="jour" items="${jours}">
+<tr data-table-row data-search="${jour.employe.personne.nomComplet} ${jour.employe.matricule}" data-statut="${jour.statut}">
+<td><strong><c:out value="${jour.dateTravail}"/></strong></td><td><strong><c:out value="${jour.employe.personne.nomComplet}"/></strong><small class="planning-muted"><c:out value="${jour.employe.matricule}"/></small></td>
+<td><c:out value="${jour.heureDebutPrevue}"/>–<c:out value="${jour.heureFinPrevue}"/><small class="planning-muted">Pause <c:out value="${jour.pausePrevueMinutes}"/> min</small></td>
+<td><c:choose><c:when test="${not empty jour.heureEntreeReelle}"><c:out value="${jour.heureEntreeReelle}"/>–<c:out value="${jour.heureSortieReelle}"/></c:when><c:otherwise><span class="planning-muted">Non renseigné</span></c:otherwise></c:choose></td>
+<td><c:choose><c:when test="${not empty jour.minutesTravaillees}"><c:out value="${jour.minutesTravaillees}"/> min<c:if test="${jour.minutesRetard > 0}"><small class="planning-danger"> · Retard <c:out value="${jour.minutesRetard}"/> min</small></c:if><c:if test="${jour.minutesSupplementaires > 0}"><small class="planning-extra"> · +<c:out value="${jour.minutesSupplementaires}"/> min</small></c:if></c:when><c:otherwise><span class="planning-muted">—</span></c:otherwise></c:choose></td>
+<td><span class="puce ${jour.statut == 'VALIDEE' ? 'puce-valide' : jour.statut == 'A_VERIFIER' ? 'puce-attente' : 'puce-brouillon'}"><c:out value="${jour.statut}"/></span></td>
+<td><button type="button" class="bouton planning-toggle" data-target="heures-${jour.id}">Saisir les heures</button><c:if test="${jour.statut == 'A_VERIFIER'}"><form class="planning-inline-form" action="${ctx}/rh/planning/jours/${jour.id}/valider" method="post"><input type="hidden" name="mois" value="${periode}"><button class="bouton planning-validate" type="submit">Valider</button></form></c:if></td></tr>
+<tr id="heures-${jour.id}" class="planning-edit-row"><td colspan="7"><form action="${ctx}/rh/planning/jours/${jour.id}/heures" method="post" class="planning-hours-form"><strong><c:out value="${jour.employe.personne.nomComplet}"/> · <c:out value="${jour.dateTravail}"/></strong><label>Entrée <input class="champ" type="time" name="entree" value="${jour.heureEntreeReelle}" required></label><label>Sortie <input class="champ" type="time" name="sortie" value="${jour.heureSortieReelle}" required></label><input type="hidden" name="mois" value="${periode}"><button class="bouton-principal" type="submit">Enregistrer</button></form></td></tr>
+</c:forEach></c:otherwise></c:choose></tbody></table></div></section>
+</main></div></div>
+<script src="${ctx}/assets/js/table-filtres.js"></script><script>document.querySelectorAll('.planning-toggle').forEach((b)=>b.addEventListener('click',()=>{const r=document.getElementById(b.dataset.target);r.classList.toggle('is-visible');}));</script>
+</body></html>
