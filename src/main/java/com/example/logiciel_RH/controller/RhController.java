@@ -640,7 +640,7 @@ public class RhController {
             if (!confirmation) {
                 throw new IllegalArgumentException("Vous devez confirmer la création de l'employé et du contrat.");
             }
-            Contrat contrat = propositionEmbaucheService.creerEmployeEtContrat(propositionId);
+            Contrat contrat = propositionEmbaucheService.creerEmployeEtContrat(propositionId, SessionUtils.getUtilisateur(session));
             redirectAttributes.addFlashAttribute("message",
                     "Employé créé et contrat " + contrat.getTypeContrat() + " activé avec succès.");
         } catch (IllegalArgumentException ex) {
