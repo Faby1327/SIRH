@@ -4,7 +4,9 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.entity.Employe;
+import com.example.logiciel_RH.entity.DetailJourTravail;
+import com.example.logiciel_RH.repository.DetailJourTravailRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
 import com.example.logiciel_RH.repository.JourTravailRepository;
 import com.example.logiciel_RH.repository.ParticipationMissionRepository;
@@ -32,15 +36,18 @@ public class EspaceEmployeController {
     private final JourTravailRepository jourRepository;
     private final PlanningJourService planningService;
     private final ParticipationMissionRepository participationRepository;
+    private final DetailJourTravailRepository detailRepository;
 
     public EspaceEmployeController(EmployeRepository employeRepository,
                                    JourTravailRepository jourRepository,
                                    PlanningJourService planningService,
-                                   ParticipationMissionRepository participationRepository) {
+                                   ParticipationMissionRepository participationRepository,
+                                   DetailJourTravailRepository detailRepository) {
         this.employeRepository = employeRepository;
         this.jourRepository = jourRepository;
         this.planningService = planningService;
         this.participationRepository = participationRepository;
+        this.detailRepository = detailRepository;
     }
 
     @GetMapping
@@ -60,9 +67,54 @@ public class EspaceEmployeController {
         }
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
         model.addAttribute("employe", employe);
-        model.addAttribute("participations", participationRepository
-                .findByEmploye_IdOrderByDateAffectationDesc(employe.getId()));
+        var participations = participationRepository
+                .findByEmploye_IdOrderByDateAffectationDesc(employe.getId());
+        Map<Long, String> dureesMission = new LinkedHashMap<>();
+        Map<Long, Integer> minutesMission = new LinkedHashMap<>();
+        for (var participation : participations) {
+            int minutes = detailRepository.totalMinutesMission(
+                    participation.getId(), DetailJourTravail.TypeDetail.MISSION);
+            minutesMission.put(participation.getId(), minutes);
+            dureesMission.put(participation.getId(), formaterDuree(minutes));
+        }
+        model.addAttribute("participations", participations);
+        model.addAttribute("dureesMission", dureesMission);
+        model.addAttribute("minutesMission", minutesMission);
         return "employe-missions";
+    }
+
+    @PostMapping("/missions/{id}/terminer")
+    @Transactional
+    public String terminerMission(@PathVariable Long id,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+        if (!SessionUtils.hasRole(session, "EMPLOYE")) return "redirect:/login";
+        try {
+            Employe employe = employeConnecte(session);
+            var participation = participationRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Affectation introuvable."));
+            if (employe == null || !employe.getId().equals(participation.getEmploye().getId())) {
+                throw new IllegalArgumentException("Cette affectation ne vous appartient pas.");
+            }
+            if (participation.getStatut() == com.example.logiciel_RH.entity.ParticipationMission.Statut.TERMINEE) {
+                throw new IllegalArgumentException("Cette affectation est déjà terminée.");
+            }
+            if (participation.getStatut() == com.example.logiciel_RH.entity.ParticipationMission.Statut.ANNULEE) {
+                throw new IllegalArgumentException("Cette affectation est annulée.");
+            }
+            int minutes = detailRepository.totalMinutesMission(
+                    participation.getId(), DetailJourTravail.TypeDetail.MISSION);
+            if (minutes <= 0) {
+                throw new IllegalArgumentException("Impossible de terminer cette affectation sans temps consacré.");
+            }
+            participation.setStatut(com.example.logiciel_RH.entity.ParticipationMission.Statut.TERMINEE);
+            participation.setDateFinReelle(java.time.LocalDate.now());
+            participationRepository.save(participation);
+            redirectAttributes.addFlashAttribute("message", "Votre affectation a été terminée.");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", "Affectation non terminée : " + ex.getMessage());
+        }
+        return "redirect:/employe/missions";
     }
 
     @GetMapping("/jours")
@@ -123,5 +175,11 @@ public class EspaceEmployeController {
     private Employe employeConnecte(HttpSession session) {
         var utilisateur = SessionUtils.getUtilisateur(session);
         return employeRepository.findByPersonne_IdPersonne(utilisateur.getPersonne().getIdPersonne()).orElse(null);
+    }
+
+    private String formaterDuree(int minutes) {
+        int heures = minutes / 60;
+        int minutesRestantes = minutes % 60;
+        return heures + " h " + String.format(Locale.ROOT, "%02d", minutesRestantes);
     }
 }

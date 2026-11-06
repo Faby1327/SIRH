@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.entity.Employe;
+import com.example.logiciel_RH.entity.DetailJourTravail;
 import com.example.logiciel_RH.entity.Mission;
 import com.example.logiciel_RH.entity.ParticipationMission;
 import com.example.logiciel_RH.repository.EmployeRepository;
+import com.example.logiciel_RH.repository.DetailJourTravailRepository;
 import com.example.logiciel_RH.repository.MissionRepository;
 import com.example.logiciel_RH.repository.ParticipationMissionRepository;
 
@@ -29,13 +31,16 @@ public class MissionController {
     private final MissionRepository missionRepository;
     private final ParticipationMissionRepository participationRepository;
     private final EmployeRepository employeRepository;
+    private final DetailJourTravailRepository detailRepository;
 
     public MissionController(MissionRepository missionRepository,
                              ParticipationMissionRepository participationRepository,
-                             EmployeRepository employeRepository) {
+                             EmployeRepository employeRepository,
+                             DetailJourTravailRepository detailRepository) {
         this.missionRepository = missionRepository;
         this.participationRepository = participationRepository;
         this.employeRepository = employeRepository;
+        this.detailRepository = detailRepository;
     }
 
     @GetMapping
@@ -101,11 +106,59 @@ public class MissionController {
         }
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
         model.addAttribute("mission", mission);
-        model.addAttribute("participations", participationRepository.findByMission_IdOrderByDateAffectationAsc(id));
+        var participations = participationRepository.findByMission_IdOrderByDateAffectationAsc(id);
+        boolean toutesAffectationsTerminees = !participations.isEmpty()
+                && participations.stream().allMatch(participation ->
+                        participation.getStatut() == ParticipationMission.Statut.TERMINEE);
+        java.util.Map<Long, String> dureesParticipation = new java.util.LinkedHashMap<>();
+        int totalMinutes = 0;
+        for (var participation : participations) {
+            int minutes = detailRepository.totalMinutesMission(
+                    participation.getId(), DetailJourTravail.TypeDetail.MISSION);
+            totalMinutes += minutes;
+            dureesParticipation.put(participation.getId(), formaterDuree(minutes));
+        }
+        model.addAttribute("participations", participations);
+        model.addAttribute("toutesAffectationsTerminees", toutesAffectationsTerminees);
+        model.addAttribute("dureesParticipation", dureesParticipation);
+        model.addAttribute("dureeTotaleMission", formaterDuree(totalMinutes));
         model.addAttribute("employes", employeRepository.findAllByOrderByDateCreationDesc());
-        model.addAttribute("statuts", Mission.Statut.values());
         model.addAttribute("participationStatuts", ParticipationMission.Statut.values());
         return "rh/mission-detail";
+    }
+
+    @PostMapping("/{id}/terminer")
+    @Transactional
+    public String terminer(@PathVariable Long id,
+                           HttpSession session,
+                           RedirectAttributes redirectAttributes) {
+        if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
+        try {
+            Mission mission = missionRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Mission introuvable."));
+            if (mission.getStatut() == Mission.Statut.TERMINEE) {
+                throw new IllegalArgumentException("Cette mission est déjà terminée.");
+            }
+            if (LocalDate.now().isBefore(mission.getDateDebut())) {
+                throw new IllegalArgumentException("La mission ne peut pas être terminée avant sa date de début.");
+            }
+            var participations = participationRepository.findByMission_IdOrderByDateAffectationAsc(id);
+            if (participations.isEmpty()) {
+                throw new IllegalArgumentException("La mission ne peut pas être terminée : aucun employé n'est affecté.");
+            }
+            boolean toutesTerminees = participations.stream()
+                    .allMatch(participation -> participation.getStatut() == ParticipationMission.Statut.TERMINEE);
+            if (!toutesTerminees) {
+                throw new IllegalArgumentException("La mission ne peut pas être terminée : toutes les affectations ne sont pas terminées.");
+            }
+            mission.setStatut(Mission.Statut.TERMINEE);
+            mission.setDateFinReelle(LocalDate.now());
+            missionRepository.save(mission);
+            redirectAttributes.addFlashAttribute("message", "Mission terminée.");
+        } catch (RuntimeException ex) {
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        }
+        return "redirect:/rh/missions/" + id;
     }
 
     @PostMapping("/{id}/participants")
@@ -120,6 +173,9 @@ public class MissionController {
         try {
             Mission mission = missionRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Mission introuvable."));
+            if (mission.getStatut() == Mission.Statut.TERMINEE) {
+                throw new IllegalArgumentException("Impossible d'affecter un employé : cette mission est terminée.");
+            }
             Employe employe = employeRepository.findById(employeId)
                     .orElseThrow(() -> new IllegalArgumentException("Employé introuvable."));
             if (roleMission == null || roleMission.isBlank()) throw new IllegalArgumentException("Le rôle est obligatoire.");
@@ -159,5 +215,9 @@ public class MissionController {
             redirectAttributes.addFlashAttribute("error", "Statut non modifié : " + ex.getMessage());
         }
         return "redirect:/rh/missions/" + id;
+    }
+
+    private String formaterDuree(int minutes) {
+        return (minutes / 60) + " h " + String.format(java.util.Locale.ROOT, "%02d", minutes % 60);
     }
 }

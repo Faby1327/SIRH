@@ -57,6 +57,11 @@ body { margin: 0; color: #17263a; background: #f3f6fa; font-family: 'IBM Plex Sa
 .employe-mission-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0; }
 .employe-mission-card dt { color: #8a96a6; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; }
 .employe-mission-card dd { margin: 4px 0 0; color: #30445f; font-size: 13px; font-weight: 700; }
+.employe-mission-time { color: #315b9d !important; }
+.employe-mission-finish-form { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e7ebf1; }
+.employe-mission-finish-form button { min-height: 38px; padding: 0 13px; border: 1px solid #315b9d; border-radius: 8px; background: #315b9d; color: #fff; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.employe-mission-finish-form button:hover { background: #24477f; border-color: #24477f; }
+.employe-mission-finished { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e7ebf1; color: #176b38; font-size: 12px; font-weight: 700; }
 .mission-status-small { display: inline-flex; padding: 5px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; white-space: nowrap; }
 .mission-status-small-AFFECTEE { background: #edf0f4; color: #586577; }.mission-status-small-EN_COURS { background: #e8f2ff; color: #1f4e79; }.mission-status-small-TERMINEE { background: #ddf2e4; color: #176b38; }.mission-status-small-ANNULEE { background: #fde4e1; color: #9a2e25; }
 .employe-mission-progress { margin-top: 20px; padding-top: 15px; border-top: 1px solid #e7ebf1; }.employe-mission-progress > div:first-child { display: flex; justify-content: space-between; color: #708096; font-size: 12px; }.employe-mission-progress strong { color: #315b9d; }.employe-progress-track { height: 7px; margin-top: 8px; overflow: hidden; border-radius: 9px; background: #e3e9f1; }.employe-progress-track span { display: block; height: 100%; border-radius: inherit; background: #315b9d; }.employe-empty { grid-column: 1 / -1; padding: 45px 20px; color: #718096; text-align: center; }.employe-empty strong { color: #30445f; }.employe-empty p { margin: 7px 0 0; font-size: 14px; }
