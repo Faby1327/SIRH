@@ -24,6 +24,7 @@
         <main class="page-espace c-page-liste c-annuaire-rh c-dossier-employe">
             <div class="dossier-retour"><a href="${ctx}/rh/employes">← Retour à la liste des employés</a></div>
             <div class="dossier-retour"><a href="${ctx}/rh/employes/${employe.id}/historique">Historique professionnel →</a></div>
+            <div class="dossier-retour"><a href="${ctx}/rh/employes/${employe.id}/situation">Situation personnelle →</a></div>
             <header class="entete dossier-hero">
                 <div class="dossier-identite">
                     <div class="dossier-avatar"><c:out value="${fn:substring(employe.personne.prenom, 0, 1)}"/><c:out value="${fn:substring(employe.personne.nom, 0, 1)}"/></div>
