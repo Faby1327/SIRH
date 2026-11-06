@@ -105,8 +105,10 @@ public class EspaceEmployeController {
             if (employe == null || !employe.getId().equals(jour.getEmploye().getId())) {
                 throw new IllegalArgumentException("Cette journée ne vous appartient pas.");
             }
-            if ("VALIDEE".equals(jour.getStatut())) {
-                throw new IllegalArgumentException("Cette journée a déjà été validée par les RH.");
+            if ("POINTAGE_VALIDE".equals(jour.getStatut())
+                    || "DETAIL_A_VERIFIER".equals(jour.getStatut())
+                    || "VALIDEE".equals(jour.getStatut())) {
+                throw new IllegalArgumentException("Le pointage de cette journée a déjà été validé par les RH.");
             }
             planningService.enregistrerHeures(id,
                     LocalTime.parse(entree, DateTimeFormatter.ISO_LOCAL_TIME),

@@ -611,7 +611,7 @@ CREATE TABLE IF NOT EXISTS jour_travail (
     CONSTRAINT fk_jour_travail_contrat FOREIGN KEY (contrat_id) REFERENCES contrat(id),
     CONSTRAINT fk_jour_travail_affectation FOREIGN KEY (affectation_horaire_id) REFERENCES affectation_horaire(id),
     CONSTRAINT uq_jour_travail_employe_date UNIQUE (employe_id, date_travail),
-    CONSTRAINT ck_jour_travail_statut CHECK (statut IN ('PLANIFIEE', 'EN_COURS', 'A_VERIFIER', 'VALIDEE', 'ABSENCE')),
+    CONSTRAINT ck_jour_travail_statut CHECK (statut IN ('PLANIFIEE', 'EN_COURS', 'POINTAGE_A_VERIFIER', 'POINTAGE_VALIDE', 'DETAIL_A_VERIFIER', 'VALIDEE', 'ABSENCE')),
     CONSTRAINT ck_jour_travail_heures_reelles CHECK (heure_sortie_reelle IS NULL OR heure_entree_reelle IS NULL OR heure_sortie_reelle >= heure_entree_reelle),
     CONSTRAINT ck_jour_travail_heures_prevues CHECK (heure_fin_prevue IS NULL OR heure_debut_prevue IS NULL OR heure_fin_prevue > heure_debut_prevue)
 );

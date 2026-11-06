@@ -72,6 +72,11 @@ public class PlanningJourService {
     public void enregistrerHeures(Long id, java.time.LocalTime entree, java.time.LocalTime sortie) {
         JourTravail jour = jourRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Journée de travail introuvable."));
+        if ("POINTAGE_VALIDE".equals(jour.getStatut())
+                || "DETAIL_A_VERIFIER".equals(jour.getStatut())
+                || "VALIDEE".equals(jour.getStatut())) {
+            throw new IllegalArgumentException("Le pointage de cette journée a déjà été validé par les RH.");
+        }
         if (entree == null || sortie == null) throw new IllegalArgumentException("Les deux heures sont obligatoires.");
         if (sortie.isBefore(entree)) throw new IllegalArgumentException("L'heure de sortie doit être après l'entrée.");
 
@@ -90,7 +95,8 @@ public class PlanningJourService {
         jour.setMinutesTravaillees(travaille);
         jour.setMinutesRetard(retard);
         jour.setMinutesSupplementaires(supplementaire);
-        jour.setStatut(retard > 0 || supplementaire > 0 ? "A_VERIFIER" : "VALIDEE");
+        // La validation du pointage est distincte de la validation des détails.
+        jour.setStatut("POINTAGE_A_VERIFIER");
         jourRepository.save(jour);
     }
 
@@ -101,7 +107,7 @@ public class PlanningJourService {
         if (jour.getHeureEntreeReelle() == null || jour.getHeureSortieReelle() == null) {
             throw new IllegalArgumentException("Les heures d'entrée et de sortie doivent être renseignées avant la validation.");
         }
-        jour.setStatut("VALIDEE");
+        jour.setStatut("POINTAGE_VALIDE");
         jourRepository.save(jour);
     }
 

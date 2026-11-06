@@ -7,6 +7,9 @@
 -- Le premier écran développé sera /rh/planning/affectations.
 -- Les régimes et modèles horaires sont les données de référence nécessaires
 -- à la création d'une affectation.
+-- Les journées de travail seront générées automatiquement par l'application.
+-- Les statuts POINTAGE_A_VERIFIER, POINTAGE_VALIDE et DETAIL_A_VERIFIER
+-- sont directement définis dans schema.sql.
 
 BEGIN;
 
