@@ -81,6 +81,11 @@
                     <tr><td>Ressources humaines</td><td class="code">hery.rh@sirh.test</td><td class="code">hash_test_3</td></tr>
                     <tr><td>Finance</td><td class="code">fara.finance@sirh.test</td><td class="code">hash_test_4</td></tr>
                     <tr><td>Directeur</td><td class="code">solo.direction@sirh.test</td><td class="code">hash_test_5</td></tr>
+                    <tr><td>Employé</td><td class="code">emma.employe@sirh.test</td><td class="code">hash_test_6</td></tr>
+                    <tr><td>Employé — Informatique</td><td class="code">lova.rakoto@sirh.test</td><td class="code">hash_test_7</td></tr>
+                    <tr><td>Employé — Informatique</td><td class="code">tiana.rabe@sirh.test</td><td class="code">hash_test_8</td></tr>
+                    <tr><td>Employé — Informatique</td><td class="code">mamy.randria@sirh.test</td><td class="code">hash_test_9</td></tr>
+                    <tr><td>Employé — Informatique</td><td class="code">feno.andria@sirh.test</td><td class="code">hash_test_10</td></tr>
                     <tr><td>Candidat</td><td colspan="2">Créez votre compte avec le lien « S'inscrire ».</td></tr>
                     </tbody>
                 </table>

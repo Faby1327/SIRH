@@ -1,0 +1,55 @@
+.c-absences { gap: 20px; }
+.c-absences > .entete h1 { margin: 4px 0; font-size: 28px; font-weight: 600; }
+.c-absences .description { margin: 6px 0 0; color: var(--c-muted); }
+.c-absences .carte { padding: 24px; background: var(--c-surface); border: 1px solid var(--c-border); border-radius: var(--r-card); }
+.c-absences .tab-radio { position: absolute; opacity: 0; }
+.c-absences .carte > label { display: inline-flex; align-items: center; min-height: 42px; margin: 0 6px 20px 0; padding: 0 16px; border-radius: var(--r-ctl); background: var(--c-bg); color: var(--c-ink-2); cursor: pointer; font-weight: 500; }
+.c-absences .tab-radio:checked + label { background: var(--c-accent); color: #fff; }
+.c-absences .panneau { display: none; }
+.c-absences #tab-conge:checked ~ .contenu-conge,
+.c-absences #tab-absence:checked ~ .contenu-absence { display: block; }
+.c-absences h2 { margin: 18px 0 14px; font-size: 19px; font-weight: 600; }
+.c-absences table { width: 100%; border-collapse: collapse; background: var(--c-surface); }
+.c-absences th { background: var(--c-bg); color: var(--c-muted); font-size: 13px; font-weight: 500; }
+.c-absences th, .c-absences td { padding: 12px; border-bottom: 1px solid var(--c-border-soft); text-align: left; vertical-align: top; }
+.c-absences .defilement { overflow-x: auto; }
+.c-absences .vide { padding: 26px 12px; color: var(--c-muted); text-align: center; }
+.c-absences .formulaire-demande { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 0 0 24px; }
+.c-absences .formulaire-demande label { display: flex; flex-direction: column; gap: 6px; color: var(--c-ink-2); font-size: 14px; }
+.c-absences .formulaire-demande .large { grid-column: 1 / -1; }
+.c-absences .formulaire-demande input, .c-absences .formulaire-demande select, .c-absences .formulaire-demande textarea,
+.c-absences .actions input { min-height: 42px; padding: 9px 11px; border: 1px solid var(--c-field); border-radius: var(--r-ctl); background: #fff; color: var(--c-ink); font: inherit; }
+.c-absences .formulaire-demande textarea { resize: vertical; }
+.c-absences .formulaire-demande .bouton-principal, .c-absences .actions button { min-height: 40px; padding: 0 14px; border: 0; border-radius: var(--r-ctl); background: var(--c-accent); color: #fff; font: inherit; font-weight: 500; cursor: pointer; }
+.c-absences .formulaire-demande > .bouton-principal { width: fit-content; min-width: 180px; }
+.c-absences .actions form { display: inline-flex; flex-wrap: wrap; gap: 6px; margin: 6px 4px 2px 0; }
+.c-absences .actions input { min-height: 36px; }
+.c-detail-demande { gap: 20px; }
+.c-detail-demande > .entete { margin-bottom: 2px; }
+.c-detail-demande .retour { width: fit-content; color: var(--c-ink-2); transition: border-color .15s, background .15s; }
+.c-detail-demande .retour:hover, .c-detail-demande .bouton-secondaire:hover { border-color: var(--c-accent); background: var(--c-bg); }
+.c-detail-demande > .carte { gap: 0; box-shadow: 0 5px 18px rgba(20, 32, 47, .035); }
+.c-detail-demande .titre-ligne { align-items: center; }
+.c-detail-demande .titre-ligne h2 { font-size: 21px; }
+.c-detail-demande .bloc { gap: 18px; }
+.c-detail-demande .bloc-remplacement { margin-top: 24px; }
+.c-detail-demande .description { margin: 5px 0 0; color: var(--c-muted); font-size: 14px; }
+.c-detail-demande .form-remplacement { display: grid; grid-template-columns: minmax(180px, 1fr) auto; align-items: end; gap: 10px 14px; }
+.c-detail-demande .form-remplacement label { grid-column: 1 / -1; margin-bottom: -6px; color: var(--c-ink-2); font-size: 14px; }
+.c-detail-demande .form-remplacement select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid var(--c-field); border-radius: var(--r-ctl); background: #fff; color: var(--c-ink); font: inherit; }
+.c-detail-demande .form-remplacement .bouton-principal { min-height: 44px; padding: 0 18px; border: 0; border-radius: var(--r-ctl); background: var(--c-accent); color: #fff; font: inherit; font-weight: 500; cursor: pointer; transition: filter .15s, transform .15s; }
+.c-detail-demande .form-remplacement .bouton-principal:hover { filter: brightness(.94); }
+.c-detail-demande .form-remplacement .bouton-principal:active { transform: translateY(1px); }
+.c-detail-demande .aucun-remplacant { grid-column: 1 / -1; margin: 0; color: var(--c-muted); font-size: 14px; }
+.c-detail-demande .carte-historique { padding-top: 0; }
+.c-detail-demande .historique { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.c-detail-demande .historique li { display: grid; grid-template-columns: minmax(160px, .7fr) 2fr; gap: 16px; padding: 14px 16px; border: 1px solid var(--c-border-soft); border-radius: 10px; background: var(--c-bg); font-size: 14px; line-height: 1.55; }
+.c-detail-demande .historique time { color: var(--c-muted); }
+.c-detail-demande .historique .vide { display: block; color: var(--c-muted); }
+.c-detail-demande .bouton-secondaire { min-height: 38px; padding: 0 12px; font-size: 14px; }
+.c-detail-demande .formulaire-demande { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.c-detail-demande .formulaire-demande .bouton-principal, .c-detail-demande .actions button { flex: 0 0 auto; width: auto !important; max-width: max-content; min-width: 128px; min-height: 38px; padding: 0 14px; font-size: 14px; }
+.c-detail-demande .formulaire-demande .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.c-detail-demande .formulaire-demande .bouton-principal:disabled { opacity: .55; cursor: not-allowed; }
+@media (max-width: 760px) { .c-detail-demande .form-remplacement { grid-template-columns: 1fr; } .c-detail-demande .form-remplacement label { grid-column: auto; } .c-detail-demande .historique li { grid-template-columns: 1fr; gap: 4px; } }
+@media (max-width: 760px) { .c-absences .formulaire-demande { grid-template-columns: 1fr; } .c-absences .formulaire-demande .large { grid-column: auto; } }

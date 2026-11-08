@@ -36,7 +36,8 @@ INSERT INTO personne (id, nom, prenom, email, telephone, ville) VALUES
     (2, 'Manager', 'Miora', 'miora.manager@sirh.test', NULL, NULL),
     (3, 'RH', 'Hery', 'hery.rh@sirh.test', NULL, NULL),
     (4, 'Finance', 'Fara', 'fara.finance@sirh.test', NULL, NULL),
-    (5, 'Direction', 'Solo', 'solo.direction@sirh.test', NULL, NULL);
+    (5, 'Direction', 'Solo', 'solo.direction@sirh.test', NULL, NULL),
+    (6, 'Employé', 'Emma', 'emma.employe@sirh.test', NULL, NULL);
 
 -- Budget annuel disponible par département.
 -- Ce montant est comparé individuellement au coût de chaque demande :
@@ -63,7 +64,38 @@ INSERT INTO utilisateur (id, personne_id, mot_de_passe, role_id, departement_id)
     (2, 2, 'hash_test_2', 1, 5),
     (3, 3, 'hash_test_3', 2, 2),
     (4, 4, 'hash_test_4', 3, 3),
-    (5, 5, 'hash_test_5', 4, 4);
+    (5, 5, 'hash_test_5', 4, 4),
+    (6, 6, 'hash_test_6', 6, 1);
+
+-- Compte employé de démonstration associé à une fiche active.
+INSERT INTO employe (id, personne_id, matricule, date_embauche, statut) VALUES
+    (1, 6, 'EMP-0001', CURRENT_DATE, 'ACTIF');
+
+-- Collègues de démonstration du même poste et département pour tester les remplacements.
+INSERT INTO personne (id, nom, prenom, email, telephone, ville) VALUES
+    (7, 'Rakoto', 'Lova', 'lova.rakoto@sirh.test', NULL, NULL),
+    (8, 'Rabe', 'Tiana', 'tiana.rabe@sirh.test', NULL, NULL),
+    (9, 'Randria', 'Mamy', 'mamy.randria@sirh.test', NULL, NULL),
+    (10, 'Andria', 'Feno', 'feno.andria@sirh.test', NULL, NULL);
+
+INSERT INTO utilisateur (id, personne_id, mot_de_passe, role_id, departement_id) VALUES
+    (7, 7, 'hash_test_7', 6, 1),
+    (8, 8, 'hash_test_8', 6, 1),
+    (9, 9, 'hash_test_9', 6, 1),
+    (10, 10, 'hash_test_10', 6, 1);
+
+INSERT INTO employe (id, personne_id, matricule, date_embauche, statut) VALUES
+    (2, 7, 'EMP-0002', CURRENT_DATE, 'ACTIF'),
+    (3, 8, 'EMP-0003', CURRENT_DATE, 'ACTIF'),
+    (4, 9, 'EMP-0004', CURRENT_DATE, 'ACTIF'),
+    (5, 10, 'EMP-0005', CURRENT_DATE, 'ACTIF');
+
+INSERT INTO contrat (employe_id, poste_id, type_contrat, date_debut, salaire_mensuel, devise, statut) VALUES
+    (1, 1, 'CDI', CURRENT_DATE, 900000, 'Ar', 'EN_COURS'),
+    (2, 1, 'CDI', CURRENT_DATE, 850000, 'Ar', 'EN_COURS'),
+    (3, 1, 'CDI', CURRENT_DATE, 850000, 'Ar', 'EN_COURS'),
+    (4, 1, 'CDI', CURRENT_DATE, 820000, 'Ar', 'EN_COURS'),
+    (5, 1, 'CDI', CURRENT_DATE, 820000, 'Ar', 'EN_COURS');
 
 INSERT INTO regle_budgetaire (id, poste_id, budget_min, budget_max) VALUES
     (1, 1, 200000, 400000),
@@ -100,9 +132,10 @@ VALUES
 SELECT setval(pg_get_serial_sequence('role', 'id'), 6, true);
 SELECT setval(pg_get_serial_sequence('statut', 'id'), 8, true);
 SELECT setval(pg_get_serial_sequence('departement', 'id'), 5, true);
-SELECT setval(pg_get_serial_sequence('personne', 'id'), 5, true);
+SELECT setval(pg_get_serial_sequence('personne', 'id'), 10, true);
 SELECT setval(pg_get_serial_sequence('poste', 'id'), 5, true);
-SELECT setval(pg_get_serial_sequence('utilisateur', 'id'), 5, true);
+SELECT setval(pg_get_serial_sequence('utilisateur', 'id'), 10, true);
+SELECT setval(pg_get_serial_sequence('employe', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('regle_budgetaire', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('budget_entreprise', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('critere_candidature', 'id'), 21, true);

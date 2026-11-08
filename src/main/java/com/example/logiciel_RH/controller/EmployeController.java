@@ -2,6 +2,8 @@ package com.example.logiciel_RH.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +43,14 @@ public class EmployeController {
     public String liste(HttpSession session, Model model) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
-        model.addAttribute("employes", employeRepository.findAllByOrderByDateCreationDesc());
+        var employes = employeRepository.findAllByOrderByDateCreationDesc();
+        Map<Long, Contrat> contratsActifs = new LinkedHashMap<>();
+        for (Employe employe : employes) {
+            contratRepository.findByEmploye_IdAndStatut(employe.getId(), Contrat.Statut.EN_COURS)
+                    .stream().findFirst().ifPresent(c -> contratsActifs.put(employe.getId(), c));
+        }
+        model.addAttribute("employes", employes);
+        model.addAttribute("contratsActifs", contratsActifs);
         return "rh/employes";
     }
 
