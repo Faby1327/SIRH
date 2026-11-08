@@ -843,3 +843,19 @@
 .c-publication .actions-preselection .champ-ligne { flex: 1 1 260px; margin-bottom: 0; }
 .c-publication .aide { margin: 4px 0 0; font-size: 12px; color: var(--c-muted); }
 .c-publication .facultatif { font-size: 12px; font-weight: 400; color: var(--c-muted); }
+
+/* ===== Bloc 5 : formulaires, documents, photo ===== */
+.dossier-formulaire { display: flex; flex-direction: column; gap: 18px; }
+.dossier-form-grid .pleine { grid-column: 1 / -1; }
+.dossier-form-grid .case { flex-direction: row; align-items: center; color: var(--c-ink-2); font-size: 14px; }
+.dossier-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 4px 0 24px; }
+.dossier-actions-ligne { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dossier-actions-ligne form { margin: 0; }
+.dossier-hero-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.dossier-photo { width: 58px; height: 58px; flex: 0 0 58px; border-radius: 16px; object-fit: cover; }
+.dossier-info-grid small { color: var(--c-muted); font-size: 12px; }
+.doc-expire { color: #9a2e25; font-weight: 700; }
+.c-annuaire-rh .filtres { flex-wrap: wrap; align-items: flex-end; }
+@media (max-width: 900px) {
+  .dossier-form-grid, .dossier-info-grid { grid-template-columns: 1fr; }
+}

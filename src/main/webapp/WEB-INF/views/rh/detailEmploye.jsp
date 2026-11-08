@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="${ctx}/assets/css/base.css">
     <link rel="stylesheet" href="${ctx}/assets/css/besoins.css">
     <link rel="stylesheet" href="${ctx}/assets/css/composants.css">
-    <link rel="stylesheet" href="${ctx}/assets/css/rh.css?v=20261103-fields">
+    <link rel="stylesheet" href="${ctx}/assets/css/rh.css?v=20261108-dossier">
 </head>
 <body>
 <div class="c-espace">
@@ -25,28 +25,40 @@
             <div class="dossier-retour"><a href="${ctx}/rh/employes">← Retour à la liste des employés</a></div>
             <header class="entete dossier-hero">
                 <div class="dossier-identite">
-                    <div class="dossier-avatar"><c:out value="${fn:substring(employe.personne.prenom, 0, 1)}"/><c:out value="${fn:substring(employe.personne.nom, 0, 1)}"/></div>
+                    <c:choose><c:when test="${not empty employe.photo}"><img class="dossier-photo" src="${ctx}/employes/${employe.id}/photo" alt="Photo de <c:out value='${employe.personne.nomComplet}'/>"></c:when><c:otherwise><div class="dossier-avatar"><c:out value="${fn:substring(employe.personne.prenom, 0, 1)}"/><c:out value="${fn:substring(employe.personne.nom, 0, 1)}"/></div></c:otherwise></c:choose>
                     <div>
                         <p class="surtitre">Dossier employé</p>
                         <h1><c:out value="${employe.personne.nomComplet}"/></h1>
                         <p class="dossier-reference"><strong><c:out value="${employe.matricule}"/></strong><span>•</span><c:out value="${employe.personne.email}"/></p>
                     </div>
                 </div>
-                <span class="dossier-statut"><c:out value="${employe.statut}"/></span>
+                <div class="dossier-hero-actions"><span class="dossier-statut"><c:out value="${employe.statut}"/></span><a class="bouton" href="${ctx}/rh/employes/${employe.id}/modifier">Modifier le dossier</a><a class="bouton" href="${ctx}/rh/employes/${employe.id}/documents">Documents (<c:out value="${nombreDocuments}"/>)</a></div>
             </header>
 
             <c:if test="${not empty message}"><div class="dossier-alert dossier-alert-ok"><c:out value="${message}"/></div></c:if>
             <c:if test="${not empty error}"><div class="dossier-alert dossier-alert-error"><c:out value="${error}"/></div></c:if>
 
             <section class="carte dossier-card">
-                <div class="dossier-card-heading"><div><span class="dossier-icon">01</span><div><h2>Informations personnelles</h2><p>Coordonnées et statut administratif de l'employé</p></div></div></div>
+                <div class="dossier-card-heading"><div><span class="dossier-icon">01</span><div><h2>Dossier de l'employé</h2><p>Identité, coordonnées, situation professionnelle et statut</p></div></div></div>
                 <div class="dossier-info-grid">
                     <div><span>Nom complet</span><strong><c:out value="${employe.personne.nomComplet}"/></strong></div>
-                    <div><span>Email</span><strong><c:out value="${employe.personne.email}"/></strong></div>
+                    <div><span>Sexe</span><strong><c:out value="${employe.sexe == 'M' ? 'Masculin' : (employe.sexe == 'F' ? 'Féminin' : '-')}"/></strong></div>
+                    <div><span>Date de naissance</span><strong><c:out value="${empty employe.personne.dateNaissance ? '-' : employe.personne.dateNaissance}"/></strong></div>
+                    <div><span>Lieu de naissance</span><strong><c:out value="${empty employe.lieuNaissance ? '-' : employe.lieuNaissance}"/></strong></div>
+                    <div><span>Nationalité</span><strong><c:out value="${empty employe.nationalite ? '-' : employe.nationalite}"/></strong></div>
+                    <div><span>CIN</span><strong><c:out value="${empty employe.cinNumero ? '-' : employe.cinNumero}"/></strong><small><c:if test="${not empty employe.cinDateDelivrance}">délivrée le <c:out value="${employe.cinDateDelivrance}"/></c:if><c:if test="${not empty employe.cinLieuDelivrance}"> à <c:out value="${employe.cinLieuDelivrance}"/></c:if></small></div>
+                    <div><span>Email personnel</span><strong><c:out value="${empty employe.personne.email ? '-' : employe.personne.email}"/></strong></div>
                     <div><span>Téléphone</span><strong><c:out value="${empty employe.personne.telephone ? '-' : employe.personne.telephone}"/></strong></div>
-                    <div><span>Ville</span><strong><c:out value="${empty employe.personne.ville ? '-' : employe.personne.ville}"/></strong></div>
-                    <div><span>Date d'embauche</span><strong><c:out value="${employe.dateEmbauche}"/></strong></div>
+                    <div><span>Situation matrimoniale</span><strong><c:out value="${empty employe.situationMatrimoniale ? '-' : employe.situationMatrimoniale}"/></strong><small><c:out value="${employe.nombreEnfants}"/> enfant(s)</small></div>
+                    <div><span>Adresse</span><strong><c:out value="${empty employe.adresse ? '-' : employe.adresse}"/></strong><small><c:out value="${employe.commune}"/><c:if test="${not empty employe.region}"> · <c:out value="${employe.region}"/></c:if></small></div>
+                    <div><span>Contact d'urgence</span><strong><c:out value="${empty employe.contactUrgenceNom ? '-' : employe.contactUrgenceNom}"/></strong><small><c:out value="${employe.contactUrgenceRelation}"/> <c:out value="${employe.contactUrgenceTelephone}"/></small></div>
                     <div><span>Matricule</span><strong><c:out value="${employe.matricule}"/></strong></div>
+                    <div><span>Département</span><strong><c:out value="${empty employe.departement ? '-' : employe.departement.nom}"/></strong></div>
+                    <div><span>Poste</span><strong><c:out value="${empty employe.poste ? '-' : employe.poste.intitule}"/></strong></div>
+                    <div><span>Supérieur hiérarchique</span><strong><c:out value="${empty employe.superieur ? '-' : employe.superieur.personne.nomComplet}"/></strong></div>
+                    <div><span>Date d'embauche</span><strong><c:out value="${employe.dateEmbauche}"/></strong></div>
+                    <div><span>Salaire actuel</span><strong><c:out value="${empty employe.salaireActuel ? '-' : employe.salaireActuel}"/><c:if test="${not empty employe.salaireActuel}"> Ar</c:if></strong></div>
+                    <c:if test="${not empty employe.dateFin}"><div><span>Date de départ</span><strong><c:out value="${employe.dateFin}"/></strong></div></c:if>
                 </div>
                 <form method="post" action="${ctx}/rh/employes/${employe.id}/statut" class="dossier-status-form">
                     <label for="statut">Modifier le statut</label>

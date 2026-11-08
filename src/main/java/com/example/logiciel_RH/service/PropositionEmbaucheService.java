@@ -337,7 +337,10 @@ public class PropositionEmbaucheService {
         contrat.setSalaireMensuel(salaireMensuel);
         contrat.setDevise("Ar");
         contrat.setStatut(Contrat.Statut.EN_COURS);
-        return contratRepository.save(contrat);
+        Contrat enregistre = contratRepository.save(contrat);
+        employe.appliquerContrat(enregistre);
+        employeRepository.save(employe);
+        return enregistre;
     }
 
     private void enregistrerHistorique(PropositionEmbauche proposition,

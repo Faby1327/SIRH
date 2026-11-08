@@ -14,6 +14,14 @@ INSERT INTO role (id, nom, description) VALUES
     (5, 'CANDIDAT', 'Consulte les offres et postule'),
     (6, 'EMPLOYE', 'Accède aux fonctionnalités internes');
 
+INSERT INTO type_document (code, libelle) VALUES
+    ('CV', 'Curriculum vitae'),
+    ('CIN', 'Carte d''identité nationale'),
+    ('DIPLOME', 'Diplôme'),
+    ('CONTRAT', 'Contrat'),
+    ('AUTRE', 'Autre pièce')
+ON CONFLICT (code) DO NOTHING;
+
 INSERT INTO statut (id, libelle, description) VALUES
     (1, 'BROUILLON', 'Demande en cours de préparation'),
     (2, 'SOUMISE', 'Demande transmise pour vérification'),
