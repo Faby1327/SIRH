@@ -131,6 +131,8 @@
   text-transform: uppercase;
 }
 .dossier-hero h1 { margin: 3px 0 6px !important; font-size: 30px !important; }
+.dossier-hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }.dossier-hero-actions .bouton { text-decoration: none; }
+.document-form { display: grid; gap: 15px; padding: 20px 24px 24px; }.document-form label, .dossier-photo-form label { display: flex; flex-direction: column; gap: 7px; color: var(--c-muted); font-size: 12px; font-weight: 600; }.document-form .champ, .dossier-photo-form .champ { min-height: 42px; box-sizing: border-box; padding: 0 11px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; font: inherit; }.document-delete-form { display: inline; margin-left: 6px; }.dossier-photo-form { padding: 15px 20px; border-top: 1px solid var(--c-border-soft); }
 .dossier-reference { display: flex; align-items: center; gap: 9px; margin: 0; color: var(--c-muted); font-size: 14px; }
 .dossier-reference strong { color: var(--c-accent); }
 .dossier-statut, .dossier-contract-status {

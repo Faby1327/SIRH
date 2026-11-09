@@ -32,7 +32,7 @@
                         <p class="dossier-reference"><strong><c:out value="${employe.matricule}"/></strong><span>•</span><c:out value="${employe.personne.email}"/></p>
                     </div>
                 </div>
-                <span class="dossier-statut"><c:out value="${employe.statut}"/></span>
+                <div class="dossier-hero-actions"><span class="dossier-statut"><c:out value="${employe.statut}"/></span><a class="bouton" href="${ctx}/rh/employes/${employe.id}/documents">Documents</a><a class="bouton bouton-principal" href="${ctx}/rh/employes/${employe.id}/modifier">Modifier le dossier</a></div>
             </header>
 
             <c:if test="${not empty message}"><div class="dossier-alert dossier-alert-ok"><c:out value="${message}"/></div></c:if>
@@ -48,6 +48,7 @@
                     <div><span>Date d'embauche</span><strong><c:out value="${employe.dateEmbauche}"/></strong></div>
                     <div><span>Matricule</span><strong><c:out value="${employe.matricule}"/></strong></div>
                 </div>
+                <form method="post" action="${ctx}/rh/employes/${employe.id}/photo" enctype="multipart/form-data" class="dossier-status-form dossier-photo-form"><label>Photo<input class="champ" type="file" name="photo" accept=".jpg,.jpeg,.png" required></label><button class="bouton" type="submit">Mettre à jour la photo</button></form>
                 <form method="post" action="${ctx}/rh/employes/${employe.id}/statut" class="dossier-status-form">
                     <label for="statut">Modifier le statut</label>
                     <select id="statut" name="statut" class="champ">

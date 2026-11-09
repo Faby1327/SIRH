@@ -32,4 +32,8 @@ public interface EmployeRepository extends JpaRepository<Employe, Long> {
 
     @Query(value = "select nextval('employe_matricule_seq')", nativeQuery = true)
     Long prochainNumeroMatricule();
+
+    @Query(value = "select coalesce(max(cast(substring(matricule from 5) as integer)), 0) + 1 "
+                 + "from employe where matricule like 'EMP-%'", nativeQuery = true)
+    Long prochainNumeroMatriculeDisponible();
 }

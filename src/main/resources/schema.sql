@@ -139,6 +139,28 @@ CREATE TABLE IF NOT EXISTS employe (
         CHECK (salaire_actuel IS NULL OR salaire_actuel >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS type_document (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(30) NOT NULL UNIQUE,
+    libelle VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS document_employe (
+    id SERIAL PRIMARY KEY,
+    employe_id INT NOT NULL,
+    type_document_id INT NOT NULL,
+    nom_fichier VARCHAR(255) NOT NULL,
+    chemin_fichier VARCHAR(500) NOT NULL,
+    date_ajout TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_expiration DATE,
+    utilisateur_id INT,
+    CONSTRAINT fk_document_employe_employe FOREIGN KEY (employe_id) REFERENCES employe(id) ON DELETE CASCADE,
+    CONSTRAINT fk_document_employe_type FOREIGN KEY (type_document_id) REFERENCES type_document(id),
+    CONSTRAINT fk_document_employe_utilisateur FOREIGN KEY (utilisateur_id) REFERENCES utilisateur(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_document_employe_employe ON document_employe(employe_id);
+
 CREATE TABLE IF NOT EXISTS statut (
     id SERIAL PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL UNIQUE,

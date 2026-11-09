@@ -191,6 +191,10 @@ SELECT setval(
 )
 FROM employe;
 
+-- Le matricule EMP-00001 est déjà utilisé par l'employé de démonstration.
+-- Le prochain employé créé recevra donc EMP-00002.
+SELECT setval('employe_matricule_seq', 1, true);
+
 SELECT setval(
     pg_get_serial_sequence('utilisateur', 'id'),
     GREATEST(6, COALESCE(MAX(id), 1)),

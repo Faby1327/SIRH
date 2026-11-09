@@ -14,6 +14,13 @@ INSERT INTO role (id, nom, description) VALUES
     (5, 'CANDIDAT', 'Consulte les offres et postule'),
     (6, 'EMPLOYE', 'Accède aux fonctionnalités internes');
 
+INSERT INTO type_document (id, code, libelle) VALUES
+    (1, 'CIN', 'Carte d''identité nationale'),
+    (2, 'DIPLOME', 'Diplôme'),
+    (3, 'CV', 'Curriculum vitae'),
+    (4, 'CERTIFICAT', 'Certificat'),
+    (5, 'AUTRE', 'Autre document');
+
 INSERT INTO statut (id, libelle, description) VALUES
     (1, 'BROUILLON', 'Demande en cours de préparation'),
     (2, 'SOUMISE', 'Demande transmise pour vérification'),
@@ -103,6 +110,7 @@ SELECT setval(pg_get_serial_sequence('departement', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('personne', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('poste', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('utilisateur', 'id'), 5, true);
+SELECT setval(pg_get_serial_sequence('type_document', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('regle_budgetaire', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('budget_entreprise', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('critere_candidature', 'id'), 21, true);

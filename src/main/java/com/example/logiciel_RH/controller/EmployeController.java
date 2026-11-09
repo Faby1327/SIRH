@@ -15,11 +15,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.entity.Contrat;
 import com.example.logiciel_RH.entity.Employe;
+import com.example.logiciel_RH.entity.EmployeForm;
 import com.example.logiciel_RH.entity.Poste;
 import com.example.logiciel_RH.repository.ContratRepository;
 import com.example.logiciel_RH.repository.DepartementRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
 import com.example.logiciel_RH.repository.PosteRepository;
+import com.example.logiciel_RH.service.EmployeDossierService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,15 +32,18 @@ public class EmployeController {
     private final ContratRepository contratRepository;
     private final PosteRepository posteRepository;
     private final DepartementRepository departementRepository;
+    private final EmployeDossierService dossierService;
 
     public EmployeController(EmployeRepository employeRepository,
                              ContratRepository contratRepository,
                              PosteRepository posteRepository,
-                             DepartementRepository departementRepository) {
+                             DepartementRepository departementRepository,
+                             EmployeDossierService dossierService) {
         this.employeRepository = employeRepository;
         this.contratRepository = contratRepository;
         this.posteRepository = posteRepository;
         this.departementRepository = departementRepository;
+        this.dossierService = dossierService;
     }
 
     @GetMapping
@@ -62,6 +67,41 @@ public class EmployeController {
         model.addAttribute("departementId", departementId);
         model.addAttribute("statutFiltre", statut);
         return "rh/employes";
+    }
+
+    @GetMapping("/nouveau")
+    public String nouveau(HttpSession session, Model model) {
+        if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
+        EmployeForm form = new EmployeForm(); form.setDateEmbauche(LocalDate.now()); form.setStatut("ACTIF");
+        preparerFormulaire(model, session, form, null);
+        model.addAttribute("formAction", "/rh/employes/nouveau"); model.addAttribute("formTitle", "Ajouter un employé"); return "rh/employe-form";
+    }
+
+    @PostMapping("/nouveau")
+    public String creer(EmployeForm form, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
+        try { Employe employe = dossierService.creer(form); redirectAttributes.addFlashAttribute("message", "Dossier créé. Matricule : " + employe.getMatricule() + "."); return "redirect:/rh/employes/" + employe.getId(); }
+        catch (RuntimeException ex) { model.addAttribute("error", ex.getMessage()); preparerFormulaire(model, session, form, null); model.addAttribute("formAction", "/rh/employes/nouveau"); model.addAttribute("formTitle", "Ajouter un employé"); return "rh/employe-form"; }
+    }
+
+    @GetMapping("/{id}/modifier")
+    public String modifier(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
+        Employe employe = employeRepository.findById(id).orElse(null); if (employe == null) { redirectAttributes.addFlashAttribute("error", "Employé introuvable."); return "redirect:/rh/employes"; }
+        model.addAttribute("employe", employe); preparerFormulaire(model, session, dossierService.versFormulaire(employe), id); model.addAttribute("formAction", "/rh/employes/" + id + "/modifier"); model.addAttribute("formTitle", "Modifier le dossier employé"); return "rh/employe-form";
+    }
+
+    @PostMapping("/{id}/modifier")
+    public String enregistrerModification(@PathVariable Long id, EmployeForm form, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
+        try { dossierService.modifier(id, form); redirectAttributes.addFlashAttribute("message", "Dossier mis à jour."); return "redirect:/rh/employes/" + id; }
+        catch (RuntimeException ex) { model.addAttribute("error", ex.getMessage()); model.addAttribute("employe", employeRepository.findById(id).orElse(null)); preparerFormulaire(model, session, form, id); model.addAttribute("formAction", "/rh/employes/" + id + "/modifier"); model.addAttribute("formTitle", "Modifier le dossier employé"); return "rh/employe-form"; }
+    }
+
+    private void preparerFormulaire(Model model, HttpSession session, EmployeForm form, Long exclureId) {
+        model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session)); model.addAttribute("form", form);
+        model.addAttribute("departements", departementRepository.findAll()); model.addAttribute("postes", posteRepository.findAll());
+        model.addAttribute("superieurs", employeRepository.findAllByOrderByDateCreationDesc().stream().filter(e -> exclureId == null || !exclureId.equals(e.getId())).toList());
     }
 
     @GetMapping("/{id}")

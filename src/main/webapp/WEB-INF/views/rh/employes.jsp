@@ -9,7 +9,7 @@
 </head><body><div class="c-espace">
 <jsp:include page="/WEB-INF/views/fragments/espace-sidebar.jsp"><jsp:param name="role" value="rh"/><jsp:param name="active" value="employes"/></jsp:include>
 <div class="contenu"><main class="page-espace c-page-liste c-annuaire-rh">
-<header class="entete"><div><p class="surtitre">Ressources humaines</p><h1>Employés et contrats</h1><p>Personnel enregistré et suivi des contrats actifs.</p></div></header>
+<header class="entete"><div><p class="surtitre">Ressources humaines</p><h1>Employés et contrats</h1><p>Personnel enregistré et suivi des contrats actifs.</p></div><a class="bouton bouton-principal" href="${ctx}/rh/employes/nouveau">+ Ajouter un employé</a></header>
 <c:if test="${not empty message}"><div class="dossier-alert dossier-alert-ok"><c:out value="${message}"/></div></c:if>
 <c:if test="${not empty error}"><div class="dossier-alert dossier-alert-error"><c:out value="${error}"/></div></c:if>
 <section class="carte c-table">
