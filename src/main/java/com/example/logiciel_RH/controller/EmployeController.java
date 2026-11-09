@@ -17,6 +17,7 @@ import com.example.logiciel_RH.entity.Contrat;
 import com.example.logiciel_RH.entity.Employe;
 import com.example.logiciel_RH.entity.Poste;
 import com.example.logiciel_RH.repository.ContratRepository;
+import com.example.logiciel_RH.repository.DepartementRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
 import com.example.logiciel_RH.repository.PosteRepository;
 
@@ -28,20 +29,38 @@ public class EmployeController {
     private final EmployeRepository employeRepository;
     private final ContratRepository contratRepository;
     private final PosteRepository posteRepository;
+    private final DepartementRepository departementRepository;
 
     public EmployeController(EmployeRepository employeRepository,
                              ContratRepository contratRepository,
-                             PosteRepository posteRepository) {
+                             PosteRepository posteRepository,
+                             DepartementRepository departementRepository) {
         this.employeRepository = employeRepository;
         this.contratRepository = contratRepository;
         this.posteRepository = posteRepository;
+        this.departementRepository = departementRepository;
     }
 
     @GetMapping
-    public String liste(HttpSession session, Model model) {
+    public String liste(@RequestParam(required = false) String q,
+                        @RequestParam(required = false) Long departementId,
+                        @RequestParam(required = false) String statut,
+                        HttpSession session, Model model) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
+        Employe.Statut statutFiltre = null;
+        if (statut != null && !statut.isBlank()) {
+            try {
+                statutFiltre = Employe.Statut.valueOf(statut);
+            } catch (IllegalArgumentException ex) {
+                statut = null;
+            }
+        }
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
-        model.addAttribute("employes", employeRepository.findAllByOrderByDateCreationDesc());
+        model.addAttribute("employes", employeRepository.rechercher(q, departementId, statutFiltre));
+        model.addAttribute("departements", departementRepository.findAll());
+        model.addAttribute("q", q);
+        model.addAttribute("departementId", departementId);
+        model.addAttribute("statutFiltre", statut);
         return "rh/employes";
     }
 

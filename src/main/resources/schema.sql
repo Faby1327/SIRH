@@ -86,15 +86,57 @@ CREATE TABLE IF NOT EXISTS employe (
     statut VARCHAR(20) NOT NULL DEFAULT 'ACTIF',
     date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
+    -- Informations administratives complémentaires du dossier employé.
+    lieu_naissance VARCHAR(100),
+    sexe VARCHAR(10),
+    nationalite VARCHAR(60),
+    cin_numero VARCHAR(30),
+    cin_date_delivrance DATE,
+    cin_lieu_delivrance VARCHAR(100),
+    adresse VARCHAR(255),
+    commune VARCHAR(100),
+    region VARCHAR(100),
+    situation_matrimoniale VARCHAR(30),
+    nombre_enfants INT NOT NULL DEFAULT 0,
+    contact_urgence_nom VARCHAR(150),
+    contact_urgence_relation VARCHAR(60),
+    contact_urgence_telephone VARCHAR(30),
+    departement_id INT,
+    poste_id INT,
+    superieur_id INT,
+    salaire_actuel NUMERIC(14,2),
+    photo VARCHAR(255),
+
     CONSTRAINT fk_employe_personne
         FOREIGN KEY (personne_id)
         REFERENCES personne(id),
+
+    CONSTRAINT fk_employe_departement
+        FOREIGN KEY (departement_id)
+        REFERENCES departement(id),
+
+    CONSTRAINT fk_employe_poste
+        FOREIGN KEY (poste_id)
+        REFERENCES poste(id),
+
+    CONSTRAINT fk_employe_superieur
+        FOREIGN KEY (superieur_id)
+        REFERENCES employe(id),
 
     CONSTRAINT ck_employe_statut
         CHECK (statut IN ('ACTIF', 'SUSPENDU', 'SORTI')),
 
     CONSTRAINT ck_employe_dates
-        CHECK (date_fin IS NULL OR date_fin >= date_embauche)
+        CHECK (date_fin IS NULL OR date_fin >= date_embauche),
+
+    CONSTRAINT ck_employe_superieur
+        CHECK (superieur_id IS NULL OR superieur_id <> id),
+
+    CONSTRAINT ck_employe_nombre_enfants
+        CHECK (nombre_enfants >= 0),
+
+    CONSTRAINT ck_employe_salaire_actuel
+        CHECK (salaire_actuel IS NULL OR salaire_actuel >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS statut (
