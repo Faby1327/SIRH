@@ -115,4 +115,21 @@ SELECT setval(pg_get_serial_sequence('regle_budgetaire', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('budget_entreprise', 'id'), 5, true);
 SELECT setval(pg_get_serial_sequence('critere_candidature', 'id'), 21, true);
 
+-- BLOC 5 - référentiels nécessaires au journal d'audit.
+INSERT INTO type_action (code, libelle) VALUES
+    ('INSERT', 'Création'),
+    ('UPDATE', 'Modification'),
+    ('DELETE', 'Suppression'),
+    ('CONSULTATION', 'Consultation')
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO type_entite (code, libelle) VALUES
+    ('EMPLOYE', 'Employé'),
+    ('CONTRAT', 'Contrat'),
+    ('FICHE_PAIE', 'Fiche de paie'),
+    ('DOCUMENT', 'Document'),
+    ('CONGE', 'Congé'),
+    ('MISSION', 'Mission')
+ON CONFLICT (code) DO NOTHING;
+
 COMMIT;
