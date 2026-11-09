@@ -23,6 +23,7 @@
                 <a href="${pageContext.request.contextPath}/rh/planning/jours" class="lien ${param.active == 'jours' ? 'actif' : ''}">Jours de travail</a>
                 <a href="${pageContext.request.contextPath}/rh/absences" class="lien ${param.active == 'absences' ? 'actif' : ''}">Absences</a>
                 <a href="${pageContext.request.contextPath}/rh/missions" class="lien ${param.active == 'missions' ? 'actif' : ''}">Missions</a>
+                <a href="${pageContext.request.contextPath}/rh/audit" class="lien ${param.active == 'audit' ? 'actif' : ''}">Journal d'audit</a>
             </c:when>
             <c:when test="${param.role == 'finance'}">
                 <a href="${pageContext.request.contextPath}/finance/accueil" class="lien ${param.active == 'budgets' ? '' : 'actif'}">Demandes</a>

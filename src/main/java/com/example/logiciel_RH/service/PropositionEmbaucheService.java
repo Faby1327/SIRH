@@ -36,19 +36,22 @@ public class PropositionEmbaucheService {
     private final HistoriquePropositionRepository historiqueRepository;
     private final EmployeRepository employeRepository;
     private final ContratRepository contratRepository;
+    private final AuditService auditService;
 
     public PropositionEmbaucheService(PropositionEmbaucheRepository propositionRepository,
                                       CandidatureRepository candidatureRepository,
                                       OffreEmploiRepository offreRepository,
                                       HistoriquePropositionRepository historiqueRepository,
                                       EmployeRepository employeRepository,
-                                      ContratRepository contratRepository) {
+                                      ContratRepository contratRepository,
+                                      AuditService auditService) {
         this.propositionRepository = propositionRepository;
         this.candidatureRepository = candidatureRepository;
         this.offreRepository = offreRepository;
         this.historiqueRepository = historiqueRepository;
         this.employeRepository = employeRepository;
         this.contratRepository = contratRepository;
+        this.auditService = auditService;
     }
 
     public List<Candidature> candidatsEligibles(Long idOffre) {
@@ -281,7 +284,7 @@ public class PropositionEmbaucheService {
     }
 
     @Transactional
-    public Contrat creerEmployeEtContrat(Long propositionId) {
+    public Contrat creerEmployeEtContrat(Long propositionId, Utilisateur acteur) {
         PropositionEmbauche proposition = propositionRepository.findById(propositionId)
                 .orElseThrow(() -> new IllegalArgumentException("Proposition introuvable."));
         if (!PropositionEmbauche.STATUT_CONFIRMEE.equals(proposition.getStatut())) {
@@ -306,6 +309,7 @@ public class PropositionEmbaucheService {
         Employe employe = employeRepository
                 .findByPersonne_IdPersonne(proposition.getCandidature().getCandidat().getPersonne().getIdPersonne())
                 .orElse(null);
+        boolean nouvelEmploye = employe == null;
         if (employe == null) {
             employe = new Employe();
             employe.setPersonne(proposition.getCandidature().getCandidat().getPersonne());
@@ -317,14 +321,22 @@ public class PropositionEmbaucheService {
         employe.setDateFin(null);
         employe.setStatut(Employe.Statut.ACTIF);
         employe = employeRepository.save(employe);
+        auditService.enregistrer(acteur, nouvelEmploye ? AuditService.INSERT : AuditService.UPDATE,
+                AuditService.EMPLOYE, employe.getId(), null,
+                AuditService.valeurs("matricule", employe.getMatricule(), "statut", employe.getStatut(),
+                        "dateEmbauche", employe.getDateEmbauche()));
 
         for (Contrat contratEnCours : contratRepository
                 .findByEmploye_IdAndStatut(employe.getId(), Contrat.Statut.EN_COURS)) {
+            Contrat.Statut ancienStatut = contratEnCours.getStatut();
             contratEnCours.setStatut(Contrat.Statut.TERMINE);
             if (contratEnCours.getDateDebut() != null && aujourdHui.isAfter(contratEnCours.getDateDebut())) {
                 contratEnCours.setDateFin(aujourdHui.minusDays(1));
             }
             contratRepository.save(contratEnCours);
+            auditService.enregistrer(acteur, AuditService.UPDATE, AuditService.CONTRAT,
+                    contratEnCours.getId(), AuditService.valeurs("statut", ancienStatut),
+                    AuditService.valeurs("statut", contratEnCours.getStatut(), "dateFin", contratEnCours.getDateFin()));
         }
 
         Contrat contrat = new Contrat();
@@ -337,7 +349,12 @@ public class PropositionEmbaucheService {
         contrat.setSalaireMensuel(salaireMensuel);
         contrat.setDevise("Ar");
         contrat.setStatut(Contrat.Statut.EN_COURS);
-        return contratRepository.save(contrat);
+        contrat = contratRepository.save(contrat);
+        auditService.enregistrer(acteur, AuditService.INSERT, AuditService.CONTRAT, contrat.getId(), null,
+                AuditService.valeurs("typeContrat", contrat.getTypeContrat(), "poste", contrat.getPoste().getIntitule(),
+                        "dateDebut", contrat.getDateDebut(), "salaireMensuel", contrat.getSalaireMensuel(),
+                        "statut", contrat.getStatut()));
+        return contrat;
     }
 
     private void enregistrerHistorique(PropositionEmbauche proposition,

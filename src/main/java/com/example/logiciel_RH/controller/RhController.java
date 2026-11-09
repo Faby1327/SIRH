@@ -35,6 +35,7 @@ import com.example.logiciel_RH.service.DemandeRecrutementService;
 import com.example.logiciel_RH.service.EntretienService;
 import com.example.logiciel_RH.service.OffreEmploiService;
 import com.example.logiciel_RH.service.PropositionEmbaucheService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -48,19 +49,22 @@ public class RhController {
     private final CandidatureService candidatureService;
     private final EntretienService entretienService;
     private final PropositionEmbaucheService propositionEmbaucheService;
+    private final AuditService auditService;
 
     public RhController(DemandeRecrutementService demandeService,
                         DepartementRepository departementRepository,
                         OffreEmploiService offreService,
                         CandidatureService candidatureService,
                         EntretienService entretienService,
-                        PropositionEmbaucheService propositionEmbaucheService) {
+                        PropositionEmbaucheService propositionEmbaucheService,
+                        AuditService auditService) {
         this.demandeService = demandeService;
         this.departementRepository = departementRepository;
         this.offreService = offreService;
         this.candidatureService = candidatureService;
         this.entretienService = entretienService;
         this.propositionEmbaucheService = propositionEmbaucheService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/accueil")
@@ -640,7 +644,8 @@ public class RhController {
             if (!confirmation) {
                 throw new IllegalArgumentException("Vous devez confirmer la création de l'employé et du contrat.");
             }
-            Contrat contrat = propositionEmbaucheService.creerEmployeEtContrat(propositionId);
+            Contrat contrat = propositionEmbaucheService.creerEmployeEtContrat(
+                    propositionId, SessionUtils.getUtilisateur(session));
             redirectAttributes.addFlashAttribute("message",
                     "Employé créé et contrat " + contrat.getTypeContrat() + " activé avec succès.");
         } catch (IllegalArgumentException ex) {

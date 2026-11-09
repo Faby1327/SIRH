@@ -909,3 +909,18 @@
 .c-publication .actions-preselection .champ-ligne { flex: 1 1 260px; margin-bottom: 0; }
 .c-publication .aide { margin: 4px 0 0; font-size: 12px; color: var(--c-muted); }
 .c-publication .facultatif { font-size: 12px; font-weight: 400; color: var(--c-muted); }
+
+/* Journal d'audit et historiques RH */
+.c-page-liste > .carte { overflow: hidden; }
+.c-page-liste > .carte .filtres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 20px 24px; }
+.c-page-liste > .carte .filtres input, .c-page-liste > .carte .filtres select { min-height: 40px; width: 100%; box-sizing: border-box; padding: 0 11px; border: 1px solid var(--c-border); border-radius: 8px; background: #fff; color: var(--c-ink); font: inherit; }
+.c-page-liste > .carte .filtres input:focus, .c-page-liste > .carte .filtres select:focus { outline: 2px solid rgba(49, 91, 157, .18); border-color: var(--c-accent); }
+.c-page-liste > .carte .filtres .bouton { min-height: 40px; }
+.c-page-liste > .carte .table-offres { width: 100%; min-width: 760px; border-collapse: collapse; }
+.c-page-liste > .carte .table-offres th { padding: 13px 16px; background: var(--c-bg); color: var(--c-muted); font-size: 11px; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.c-page-liste > .carte .table-offres td { padding: 14px 16px; border-top: 1px solid var(--c-border-soft); vertical-align: middle; white-space: nowrap; }
+.c-page-liste > .carte .table-offres tbody tr:hover { background: #f8fbff; }
+.c-page-liste > .carte .table-offres .bouton { display: inline-flex; align-items: center; min-height: 34px; padding: 0 11px; border: 1px solid var(--c-border); border-radius: 8px; background: #fff; color: var(--c-accent); text-decoration: none; font-size: 12px; font-weight: 700; }
+.c-page-liste > .carte .table-offres .bouton:hover { border-color: var(--c-accent); background: var(--c-accent); color: #fff; }
+@media (max-width: 800px) { .c-page-liste > .carte .filtres { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .c-page-liste > .carte .filtres { grid-template-columns: 1fr; padding: 16px; } }
