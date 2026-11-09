@@ -779,14 +779,33 @@ CREATE TABLE IF NOT EXISTS heure_supplementaire (
     nombre_minutes INT NOT NULL CHECK (nombre_minutes > 0),
     motif TEXT NOT NULL,
     statut VARCHAR(20) NOT NULL DEFAULT 'DEMANDEE',
-    manager_id INT NOT NULL,
     date_demande TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_validation TIMESTAMP,
     CONSTRAINT fk_heure_supp_jour_travail FOREIGN KEY (jour_travail_id) REFERENCES jour_travail(id) ON DELETE CASCADE,
     CONSTRAINT fk_heure_supp_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
-    CONSTRAINT fk_heure_supp_manager FOREIGN KEY (manager_id) REFERENCES utilisateur(id),
     CONSTRAINT ck_heure_supp_heures CHECK (heure_fin > heure_debut),
     CONSTRAINT ck_heure_supp_statut CHECK (statut IN ('DEMANDEE', 'VALIDEE', 'REFUSEE', 'ANNULEE'))
+);
+
+CREATE TABLE IF NOT EXISTS ligne_fiche_paie (
+    id SERIAL PRIMARY KEY,
+    fiche_paie_id INT NOT NULL,
+    type_ligne VARCHAR(20) NOT NULL DEFAULT 'PRIME',
+    libelle VARCHAR(255) NOT NULL,
+    montant NUMERIC(12,2) NOT NULL,
+    source VARCHAR(40) NOT NULL,
+    heure_supplementaire_id INT,
+    nombre_minutes INT,
+    taux_majoration NUMERIC(5,2),
+    date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ligne_fiche_paie FOREIGN KEY (fiche_paie_id) REFERENCES fiche_paie(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ligne_heure_supp FOREIGN KEY (heure_supplementaire_id) REFERENCES heure_supplementaire(id),
+    CONSTRAINT ck_ligne_type CHECK (type_ligne IN ('PRIME')),
+    CONSTRAINT ck_ligne_source CHECK (source IN ('HEURE_SUPPLEMENTAIRE', 'MANUELLE')),
+    CONSTRAINT ck_ligne_montant CHECK (montant >= 0),
+    CONSTRAINT ck_ligne_minutes CHECK (nombre_minutes IS NULL OR nombre_minutes > 0),
+    CONSTRAINT ck_ligne_majoration CHECK (taux_majoration IS NULL OR taux_majoration >= 1),
+    CONSTRAINT uq_ligne_fiche_heure_supp UNIQUE (fiche_paie_id, heure_supplementaire_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_poste_departement ON poste(departement_id);
@@ -821,6 +840,7 @@ CREATE INDEX IF NOT EXISTS idx_contrat_poste ON contrat(poste_id);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_periode ON fiche_paie(annee, mois);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_statut ON fiche_paie(statut);
 CREATE INDEX IF NOT EXISTS idx_fiche_paie_employe ON fiche_paie(employe_id);
+CREATE INDEX IF NOT EXISTS idx_ligne_fiche_paie ON ligne_fiche_paie(fiche_paie_id);
 CREATE INDEX IF NOT EXISTS idx_paiement_salaire_date ON paiement_salaire(date_paiement);
 CREATE INDEX IF NOT EXISTS idx_affectation_horaire_employe ON affectation_horaire(employe_id);
 CREATE INDEX IF NOT EXISTS idx_affectation_horaire_periode ON affectation_horaire(date_debut, date_fin);

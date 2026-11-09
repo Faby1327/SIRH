@@ -12,9 +12,11 @@ import com.example.logiciel_RH.entity.AffectationHoraire;
 import com.example.logiciel_RH.entity.Absence;
 import com.example.logiciel_RH.entity.Contrat;
 import com.example.logiciel_RH.entity.JourTravail;
+import com.example.logiciel_RH.entity.HeureSupplementaire;
 import com.example.logiciel_RH.repository.AffectationHoraireRepository;
 import com.example.logiciel_RH.repository.AbsenceRepository;
 import com.example.logiciel_RH.repository.ContratRepository;
+import com.example.logiciel_RH.repository.HeureSupplementaireRepository;
 import com.example.logiciel_RH.repository.JourTravailRepository;
 
 @Service
@@ -24,15 +26,18 @@ public class PlanningJourService {
     private final JourTravailRepository jourRepository;
     private final ContratRepository contratRepository;
     private final AbsenceRepository absenceRepository;
+    private final HeureSupplementaireRepository heureSupplementaireRepository;
 
     public PlanningJourService(AffectationHoraireRepository affectationRepository,
                                JourTravailRepository jourRepository,
                                ContratRepository contratRepository,
-                               AbsenceRepository absenceRepository) {
+                               AbsenceRepository absenceRepository,
+                               HeureSupplementaireRepository heureSupplementaireRepository) {
         this.affectationRepository = affectationRepository;
         this.jourRepository = jourRepository;
         this.contratRepository = contratRepository;
         this.absenceRepository = absenceRepository;
+        this.heureSupplementaireRepository = heureSupplementaireRepository;
     }
 
     @Transactional
@@ -131,6 +136,28 @@ public class PlanningJourService {
         }
         jour.setStatut("POINTAGE_VALIDE");
         jourRepository.save(jour);
+        creerDemandeHeuresSupplementaires(jour);
+    }
+
+    private void creerDemandeHeuresSupplementaires(JourTravail jour) {
+        Integer minutes = jour.getMinutesSupplementaires();
+        if (minutes == null || minutes <= 0 || jour.getHeureSortieReelle() == null
+                || jour.getHeureFinPrevue() == null
+                || heureSupplementaireRepository.findByJourTravail_Id(jour.getId()).isPresent()) {
+            return;
+        }
+
+        HeureSupplementaire heure = new HeureSupplementaire();
+        heure.setJourTravail(jour);
+        heure.setEmploye(jour.getEmploye());
+        heure.setDateTravail(jour.getDateTravail());
+        heure.setHeureDebut(jour.getHeureFinPrevue());
+        heure.setHeureFin(jour.getHeureSortieReelle());
+        heure.setNombreMinutes(minutes);
+        heure.setMotif("Heures supplémentaires calculées à partir du pointage validé.");
+        heure.setStatut("DEMANDEE");
+        heure.setDateDemande(java.time.LocalDateTime.now());
+        heureSupplementaireRepository.save(heure);
     }
 
     @Transactional(readOnly = true)

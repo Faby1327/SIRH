@@ -30,6 +30,12 @@
                 <div class="dossier-info-grid"><div><span>Employé</span><strong><c:out value="${fiche.employe.personne.nomComplet}"/></strong></div><div><span>Poste</span><strong><c:out value="${fiche.contrat.poste.intitule}"/></strong></div><div><span>Contrat</span><strong><c:out value="${fiche.contrat.typeContrat}"/></strong></div><div><span>Salaire de base</span><strong><c:out value="${fiche.salaireBase}"/> Ar</strong></div><div><span>Primes</span><strong><c:out value="${fiche.totalPrimes}"/> Ar</strong></div><div><span>Retenues</span><strong><c:out value="${fiche.totalRetenues}"/> Ar</strong></div></div>
                 <div class="paie-total"><span>Net à payer</span><strong><c:out value="${fiche.netAPayer}"/> Ar</strong></div>
             </section>
+            <section class="carte dossier-card paie-lignes-card">
+                <div class="dossier-card-heading"><div><span class="dossier-icon dossier-icon-green">02</span><div><h2>Détail des primes</h2><p>Seules les heures supplémentaires validées sont intégrées.</p></div></div></div>
+                <div class="defilement"><table class="table-offres"><thead><tr><th>Libellé</th><th>Minutes</th><th>Majoration</th><th>Montant</th></tr></thead><tbody>
+                <c:choose><c:when test="${empty lignes}"><tr><td colspan="4" class="dossier-empty">Aucune prime d'heure supplémentaire validée.</td></tr></c:when><c:otherwise><c:forEach var="ligne" items="${lignes}"><tr><td><c:out value="${ligne.libelle}"/></td><td><c:out value="${ligne.nombreMinutes}"/> min</td><td><c:out value="${ligne.tauxMajoration}"/>×</td><td><strong><c:out value="${ligne.montant}"/> Ar</strong></td></tr></c:forEach></c:otherwise></c:choose>
+                </tbody></table></div>
+            </section>
             <section class="carte dossier-card paie-actions-card">
                 <div class="dossier-card-heading"><div><span class="dossier-icon dossier-icon-green">02</span><div><h2>Action</h2><p>Suivez les étapes de validation et de paiement</p></div></div></div>
                 <div class="paie-action-content">

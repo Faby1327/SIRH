@@ -61,6 +61,7 @@ public class PaieController {
         }
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
         model.addAttribute("fiche", fiche);
+        model.addAttribute("lignes", paieService.lignes(id));
         model.addAttribute("paiement", paiementRepository.findByFichePaie_Id(id).orElse(null));
         auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.CONSULTATION,
                 AuditService.FICHE_PAIE, id, null, null);

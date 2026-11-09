@@ -924,3 +924,18 @@
 .c-page-liste > .carte .table-offres .bouton:hover { border-color: var(--c-accent); background: var(--c-accent); color: #fff; }
 @media (max-width: 800px) { .c-page-liste > .carte .filtres { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .c-page-liste > .carte .filtres { grid-template-columns: 1fr; padding: 16px; } }
+
+/* Heures supplémentaires RH */
+.c-heures-supp-page .entete { margin-bottom: 24px; }
+.heures-supp-table { min-width: 980px !important; }
+.heures-supp-muted { display: block; margin-top: 4px; color: var(--c-muted); font-size: 12px; }
+.heures-supp-status { display: inline-flex; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.heures-supp-status-DEMANDEE { background: #fff3d8; color: #8a5b00; }
+.heures-supp-status-VALIDEE { background: #d9f0e2; color: #176b38; }
+.heures-supp-status-REFUSEE, .heures-supp-status-ANNULEE { background: #fbe4e1; color: #8b2b20; }
+.heures-supp-action { display: inline-block; margin: 0 4px 0 0; }
+.heures-supp-validate { border-color: #b7dcc1 !important; background: #effaf2 !important; color: #176b38 !important; }
+.heures-supp-validate:hover { border-color: #287747 !important; background: #287747 !important; color: #fff !important; }
+.heures-supp-refuse { border-color: #efc3bd !important; background: #fff7f5 !important; color: #9a3428 !important; }
+.heures-supp-refuse:hover { border-color: #9a3428 !important; background: #9a3428 !important; color: #fff !important; }
+.paie-lignes-card .table-offres { min-width: 680px !important; }
