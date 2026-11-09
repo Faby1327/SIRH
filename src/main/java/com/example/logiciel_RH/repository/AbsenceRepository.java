@@ -12,6 +12,15 @@ import com.example.logiciel_RH.entity.Absence;
 public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     List<Absence> findAllByOrderByDateDebutDesc();
 
+    @Query("select a from Absence a where a.employe.id = :employeId "
+         + "and a.statut = :statut and a.impactPaie = true "
+         + "and a.dateDebut <= :fin and a.dateFin >= :debut "
+         + "order by a.dateDebut")
+    List<Absence> findAbsencesAvecRetenue(@Param("employeId") Long employeId,
+                                          @Param("debut") LocalDate debut,
+                                          @Param("fin") LocalDate fin,
+                                          @Param("statut") Absence.Statut statut);
+
     @Query("select count(a) > 0 from Absence a "
          + "where a.employe.id = :employeId "
          + "and a.statut = :statut "

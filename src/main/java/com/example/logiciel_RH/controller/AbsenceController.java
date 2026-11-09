@@ -49,6 +49,7 @@ public class AbsenceController {
                         @RequestParam String dateFin,
                         @RequestParam String typeAbsence,
                         @RequestParam(required = false) String motif,
+                        @RequestParam(defaultValue = "false") boolean impactPaie,
                         HttpSession session,
                         RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
@@ -63,6 +64,7 @@ public class AbsenceController {
             absence.setDateFin(fin);
             absence.setTypeAbsence(Absence.TypeAbsence.valueOf(typeAbsence));
             absence.setMotif(motif == null || motif.isBlank() ? null : motif.trim());
+            absence.setImpactPaie(impactPaie);
             absence.setStatut(Absence.Statut.VALIDEE);
             absence.setValidePar(SessionUtils.getUtilisateur(session));
             absence.setDateDemande(LocalDateTime.now());

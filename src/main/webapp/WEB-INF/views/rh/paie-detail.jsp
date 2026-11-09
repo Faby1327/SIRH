@@ -32,8 +32,8 @@
             </section>
             <section class="carte dossier-card paie-lignes-card">
                 <div class="dossier-card-heading"><div><span class="dossier-icon dossier-icon-green">02</span><div><h2>Détail des primes</h2><p>Seules les heures supplémentaires validées sont intégrées.</p></div></div></div>
-                <div class="defilement"><table class="table-offres"><thead><tr><th>Libellé</th><th>Minutes</th><th>Majoration</th><th>Montant</th></tr></thead><tbody>
-                <c:choose><c:when test="${empty lignes}"><tr><td colspan="4" class="dossier-empty">Aucune prime d'heure supplémentaire validée.</td></tr></c:when><c:otherwise><c:forEach var="ligne" items="${lignes}"><tr><td><c:out value="${ligne.libelle}"/></td><td><c:out value="${ligne.nombreMinutes}"/> min</td><td><c:out value="${ligne.tauxMajoration}"/>×</td><td><strong><c:out value="${ligne.montant}"/> Ar</strong></td></tr></c:forEach></c:otherwise></c:choose>
+                <div class="defilement"><table class="table-offres"><thead><tr><th>Type</th><th>Libellé</th><th>Durée</th><th>Majoration</th><th>Montant</th></tr></thead><tbody>
+                <c:choose><c:when test="${empty lignes}"><tr><td colspan="5" class="dossier-empty">Aucune prime ou retenue enregistrée.</td></tr></c:when><c:otherwise><c:forEach var="ligne" items="${lignes}"><tr><td><c:out value="${ligne.typeLigne}"/></td><td><c:out value="${ligne.libelle}"/></td><td><c:choose><c:when test="${not empty ligne.nombreMinutes}"><c:out value="${ligne.nombreMinutes}"/> min</c:when><c:when test="${not empty ligne.nombreJours}"><c:out value="${ligne.nombreJours}"/> jour(s)</c:when><c:otherwise>—</c:otherwise></c:choose></td><td><c:choose><c:when test="${not empty ligne.tauxMajoration}"><c:out value="${ligne.tauxMajoration}"/>×</c:when><c:otherwise>—</c:otherwise></c:choose></td><td><strong><c:out value="${ligne.montant}"/> Ar</strong></td></tr></c:forEach></c:otherwise></c:choose>
                 </tbody></table></div>
             </section>
             <section class="carte dossier-card paie-actions-card">

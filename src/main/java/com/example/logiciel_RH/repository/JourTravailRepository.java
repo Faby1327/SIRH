@@ -11,4 +11,5 @@ import com.example.logiciel_RH.entity.JourTravail;
 public interface JourTravailRepository extends JpaRepository<JourTravail, Long> {
     List<JourTravail> findByDateTravailBetweenOrderByDateTravailAscEmploye_IdAsc(LocalDate debut, LocalDate fin);
     Optional<JourTravail> findByEmploye_IdAndDateTravail(Long employeId, LocalDate dateTravail);
+    List<JourTravail> findByEmploye_IdAndDateTravailBetween(Long employeId, LocalDate debut, LocalDate fin);
 }

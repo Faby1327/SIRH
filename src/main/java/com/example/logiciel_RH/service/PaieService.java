@@ -5,22 +5,28 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.math.RoundingMode;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.logiciel_RH.entity.Contrat;
+import com.example.logiciel_RH.entity.Absence;
 import com.example.logiciel_RH.entity.FichePaie;
 import com.example.logiciel_RH.entity.HeureSupplementaire;
 import com.example.logiciel_RH.entity.LigneFichePaie;
 import com.example.logiciel_RH.entity.PaiementSalaire;
+import com.example.logiciel_RH.entity.JourTravail;
 import com.example.logiciel_RH.repository.ContratRepository;
 import com.example.logiciel_RH.repository.FichePaieRepository;
 import com.example.logiciel_RH.repository.PaiementSalaireRepository;
 import com.example.logiciel_RH.repository.HeureSupplementaireRepository;
 import com.example.logiciel_RH.repository.LigneFichePaieRepository;
+import com.example.logiciel_RH.repository.AbsenceRepository;
+import com.example.logiciel_RH.service.PlanningJourService;
 
 @Service
 public class PaieService {
@@ -33,17 +39,23 @@ public class PaieService {
     private final PaiementSalaireRepository paiementRepository;
     private final HeureSupplementaireRepository heureSupplementaireRepository;
     private final LigneFichePaieRepository ligneRepository;
+    private final AbsenceRepository absenceRepository;
+    private final PlanningJourService planningJourService;
 
     public PaieService(ContratRepository contratRepository,
                        FichePaieRepository fichePaieRepository,
                        PaiementSalaireRepository paiementRepository,
                        HeureSupplementaireRepository heureSupplementaireRepository,
-                       LigneFichePaieRepository ligneRepository) {
+                       LigneFichePaieRepository ligneRepository,
+                       AbsenceRepository absenceRepository,
+                       PlanningJourService planningJourService) {
         this.contratRepository = contratRepository;
         this.fichePaieRepository = fichePaieRepository;
         this.paiementRepository = paiementRepository;
         this.heureSupplementaireRepository = heureSupplementaireRepository;
         this.ligneRepository = ligneRepository;
+        this.absenceRepository = absenceRepository;
+        this.planningJourService = planningJourService;
     }
 
     @Transactional
@@ -86,8 +98,9 @@ public class PaieService {
             fichePaieRepository.save(fiche);
         }
         List<FichePaie> fiches = fichePaieRepository.findByAnneeAndMoisOrderByIdDesc(annee, mois);
+        List<JourTravail> jours = planningJourService.genererEtLister(YearMonth.of(annee, mois));
         fiches.stream().filter(fiche -> fiche.getStatut() == FichePaie.Statut.BROUILLON)
-                .forEach(this::synchroniserPrimesHeuresSupplementaires);
+                .forEach(fiche -> synchroniserLignesVariables(fiche, jours));
         return fiches;
     }
 
@@ -104,7 +117,9 @@ public class PaieService {
         if (fiche.getStatut() != FichePaie.Statut.BROUILLON) {
             throw new IllegalArgumentException("Seule une fiche brouillon peut être validée.");
         }
-        synchroniserPrimesHeuresSupplementaires(fiche);
+        List<JourTravail> jours = planningJourService.genererEtLister(
+                YearMonth.of(fiche.getAnnee(), fiche.getMois()));
+        synchroniserLignesVariables(fiche, jours);
         fiche.setStatut(FichePaie.Statut.VALIDEE);
         fiche.setDateValidation(LocalDateTime.now());
         return fichePaieRepository.save(fiche);
@@ -115,8 +130,9 @@ public class PaieService {
         return ligneRepository.findByFichePaie_IdOrderByIdAsc(ficheId);
     }
 
-    private void synchroniserPrimesHeuresSupplementaires(FichePaie fiche) {
+    private void synchroniserLignesVariables(FichePaie fiche, List<JourTravail> jours) {
         ligneRepository.deleteByFichePaie_IdAndSource(fiche.getId(), "HEURE_SUPPLEMENTAIRE");
+        ligneRepository.deleteByFichePaie_IdAndSource(fiche.getId(), "ABSENCE");
         // Hibernate peut différer les DELETE jusqu'au commit. Il faut vider
         // la file SQL avant de réinsérer les mêmes heures supplémentaires.
         ligneRepository.flush();
@@ -147,9 +163,45 @@ public class PaieService {
             totalPrimes = totalPrimes.add(montant);
         }
 
+        List<Absence> absences = absenceRepository.findAbsencesAvecRetenue(
+                fiche.getEmploye().getId(), periode.atDay(1), periode.atEndOfMonth(), Absence.Statut.VALIDEE);
+        List<JourTravail> joursEmploye = jours.stream()
+                .filter(jour -> fiche.getEmploye().getId().equals(jour.getEmploye().getId()))
+                .toList();
+        long joursPlanifies = joursEmploye.size();
+        BigDecimal totalRetenues = BigDecimal.ZERO;
+        Set<LocalDate> datesDejaRetenues = new HashSet<>();
+
+        for (Absence absence : absences) {
+            long joursAbsents = joursEmploye.stream()
+                    .filter(jour -> "ABSENCE".equals(jour.getStatut()))
+                    .filter(jour -> !jour.getDateTravail().isBefore(absence.getDateDebut())
+                            && !jour.getDateTravail().isAfter(absence.getDateFin()))
+                    .map(JourTravail::getDateTravail)
+                    .filter(datesDejaRetenues::add)
+                    .count();
+            if (joursAbsents == 0 || joursPlanifies == 0) continue;
+
+            BigDecimal montant = fiche.getSalaireBase()
+                    .divide(BigDecimal.valueOf(joursPlanifies), 10, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(joursAbsents))
+                    .setScale(2, RoundingMode.HALF_UP);
+            LigneFichePaie ligne = new LigneFichePaie();
+            ligne.setFichePaie(fiche);
+            ligne.setTypeLigne("RETENUE");
+            ligne.setLibelle("Retenue pour absence du " + absence.getDateDebut()
+                    + " au " + absence.getDateFin());
+            ligne.setMontant(montant);
+            ligne.setSource("ABSENCE");
+            ligne.setAbsence(absence);
+            ligne.setNombreJours((int) joursAbsents);
+            ligneRepository.save(ligne);
+            totalRetenues = totalRetenues.add(montant);
+        }
+
         fiche.setTotalPrimes(totalPrimes);
-        BigDecimal retenues = fiche.getTotalRetenues() == null ? BigDecimal.ZERO : fiche.getTotalRetenues();
-        fiche.setNetAPayer(fiche.getSalaireBase().add(totalPrimes).subtract(retenues));
+        fiche.setTotalRetenues(totalRetenues);
+        fiche.setNetAPayer(fiche.getSalaireBase().add(totalPrimes).subtract(totalRetenues));
         fichePaieRepository.save(fiche);
     }
 

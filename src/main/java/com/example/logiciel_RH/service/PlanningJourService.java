@@ -66,7 +66,8 @@ public class PlanningJourService {
                 var jourExistant = jourRepository.findByEmploye_IdAndDateTravail(
                         affectation.getEmploye().getId(), date);
                 if (absenceValidee) {
-                    jourExistant.ifPresent(jour -> {
+                    if (jourExistant.isPresent()) {
+                        JourTravail jour = jourExistant.get();
                         if (!"POINTAGE_VALIDE".equals(jour.getStatut())
                                 && !"VALIDEE".equals(jour.getStatut())) {
                             jour.setStatut("ABSENCE");
@@ -74,7 +75,18 @@ public class PlanningJourService {
                             jour.setHeureSortieReelle(null);
                             jourRepository.save(jour);
                         }
-                    });
+                    } else {
+                        JourTravail jour = new JourTravail();
+                        jour.setEmploye(affectation.getEmploye());
+                        jour.setContrat(contrat);
+                        jour.setAffectationHoraire(affectation);
+                        jour.setDateTravail(date);
+                        jour.setHeureDebutPrevue(affectation.getModeleHoraire().getHeureDebut());
+                        jour.setHeureFinPrevue(affectation.getModeleHoraire().getHeureFin());
+                        jour.setPausePrevueMinutes(affectation.getModeleHoraire().getPausePrevueMinutes());
+                        jour.setStatut("ABSENCE");
+                        jourRepository.save(jour);
+                    }
                     continue;
                 }
                 if (jourExistant.isPresent()) continue;

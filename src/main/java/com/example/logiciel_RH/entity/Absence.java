@@ -42,6 +42,9 @@ public class Absence {
 
     private String motif;
 
+    @Column(name = "impact_paie", nullable = false)
+    private boolean impactPaie = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Statut statut = Statut.VALIDEE;
@@ -68,6 +71,8 @@ public class Absence {
     public void setTypeAbsence(TypeAbsence typeAbsence) { this.typeAbsence = typeAbsence; }
     public String getMotif() { return motif; }
     public void setMotif(String motif) { this.motif = motif; }
+    public boolean isImpactPaie() { return impactPaie; }
+    public void setImpactPaie(boolean impactPaie) { this.impactPaie = impactPaie; }
     public Statut getStatut() { return statut; }
     public void setStatut(Statut statut) { this.statut = statut; }
     public Utilisateur getValidePar() { return validePar; }

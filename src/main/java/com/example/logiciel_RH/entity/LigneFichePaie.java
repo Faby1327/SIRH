@@ -44,8 +44,15 @@ public class LigneFichePaie {
     @JoinColumn(name = "heure_supplementaire_id")
     private HeureSupplementaire heureSupplementaire;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "absence_id")
+    private Absence absence;
+
     @Column(name = "nombre_minutes")
     private Integer nombreMinutes;
+
+    @Column(name = "nombre_jours")
+    private Integer nombreJours;
 
     @Column(name = "taux_majoration", precision = 5, scale = 2)
     private BigDecimal tauxMajoration;
@@ -67,8 +74,12 @@ public class LigneFichePaie {
     public void setSource(String source) { this.source = source; }
     public HeureSupplementaire getHeureSupplementaire() { return heureSupplementaire; }
     public void setHeureSupplementaire(HeureSupplementaire heureSupplementaire) { this.heureSupplementaire = heureSupplementaire; }
+    public Absence getAbsence() { return absence; }
+    public void setAbsence(Absence absence) { this.absence = absence; }
     public Integer getNombreMinutes() { return nombreMinutes; }
     public void setNombreMinutes(Integer nombreMinutes) { this.nombreMinutes = nombreMinutes; }
+    public Integer getNombreJours() { return nombreJours; }
+    public void setNombreJours(Integer nombreJours) { this.nombreJours = nombreJours; }
     public BigDecimal getTauxMajoration() { return tauxMajoration; }
     public void setTauxMajoration(BigDecimal tauxMajoration) { this.tauxMajoration = tauxMajoration; }
     public LocalDateTime getDateCreation() { return dateCreation; }

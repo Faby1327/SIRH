@@ -705,6 +705,7 @@ CREATE TABLE IF NOT EXISTS absence (
     date_fin DATE NOT NULL,
     type_absence VARCHAR(30) NOT NULL,
     motif TEXT,
+    impact_paie BOOLEAN NOT NULL DEFAULT FALSE,
     statut VARCHAR(20) NOT NULL DEFAULT 'DEMANDEE',
     valide_par INT,
     date_demande TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -795,17 +796,22 @@ CREATE TABLE IF NOT EXISTS ligne_fiche_paie (
     montant NUMERIC(12,2) NOT NULL,
     source VARCHAR(40) NOT NULL,
     heure_supplementaire_id INT,
+    absence_id INT,
     nombre_minutes INT,
+    nombre_jours INT,
     taux_majoration NUMERIC(5,2),
     date_creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_ligne_fiche_paie FOREIGN KEY (fiche_paie_id) REFERENCES fiche_paie(id) ON DELETE CASCADE,
     CONSTRAINT fk_ligne_heure_supp FOREIGN KEY (heure_supplementaire_id) REFERENCES heure_supplementaire(id),
-    CONSTRAINT ck_ligne_type CHECK (type_ligne IN ('PRIME')),
-    CONSTRAINT ck_ligne_source CHECK (source IN ('HEURE_SUPPLEMENTAIRE', 'MANUELLE')),
+    CONSTRAINT fk_ligne_absence FOREIGN KEY (absence_id) REFERENCES absence(id),
+    CONSTRAINT ck_ligne_type CHECK (type_ligne IN ('PRIME', 'RETENUE')),
+    CONSTRAINT ck_ligne_source CHECK (source IN ('HEURE_SUPPLEMENTAIRE', 'ABSENCE', 'MANUELLE')),
     CONSTRAINT ck_ligne_montant CHECK (montant >= 0),
     CONSTRAINT ck_ligne_minutes CHECK (nombre_minutes IS NULL OR nombre_minutes > 0),
+    CONSTRAINT ck_ligne_jours CHECK (nombre_jours IS NULL OR nombre_jours > 0),
     CONSTRAINT ck_ligne_majoration CHECK (taux_majoration IS NULL OR taux_majoration >= 1),
-    CONSTRAINT uq_ligne_fiche_heure_supp UNIQUE (fiche_paie_id, heure_supplementaire_id)
+    CONSTRAINT uq_ligne_fiche_heure_supp UNIQUE (fiche_paie_id, heure_supplementaire_id),
+    CONSTRAINT uq_ligne_fiche_absence UNIQUE (fiche_paie_id, absence_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_poste_departement ON poste(departement_id);
