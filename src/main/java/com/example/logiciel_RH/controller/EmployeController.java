@@ -22,6 +22,7 @@ import com.example.logiciel_RH.repository.DepartementRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
 import com.example.logiciel_RH.repository.PosteRepository;
 import com.example.logiciel_RH.service.EmployeDossierService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -33,17 +34,20 @@ public class EmployeController {
     private final PosteRepository posteRepository;
     private final DepartementRepository departementRepository;
     private final EmployeDossierService dossierService;
+    private final AuditService auditService;
 
     public EmployeController(EmployeRepository employeRepository,
                              ContratRepository contratRepository,
                              PosteRepository posteRepository,
                              DepartementRepository departementRepository,
-                             EmployeDossierService dossierService) {
+                             EmployeDossierService dossierService,
+                             AuditService auditService) {
         this.employeRepository = employeRepository;
         this.contratRepository = contratRepository;
         this.posteRepository = posteRepository;
         this.departementRepository = departementRepository;
         this.dossierService = dossierService;
+        this.auditService = auditService;
     }
 
     @GetMapping
@@ -80,7 +84,7 @@ public class EmployeController {
     @PostMapping("/nouveau")
     public String creer(EmployeForm form, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
-        try { Employe employe = dossierService.creer(form); redirectAttributes.addFlashAttribute("message", "Dossier créé. Matricule : " + employe.getMatricule() + "."); return "redirect:/rh/employes/" + employe.getId(); }
+        try { Employe employe = dossierService.creer(form); auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.INSERT, AuditService.EMPLOYE, employe.getId(), null, valeursEmploye(employe)); redirectAttributes.addFlashAttribute("message", "Dossier créé. Matricule : " + employe.getMatricule() + "."); return "redirect:/rh/employes/" + employe.getId(); }
         catch (RuntimeException ex) { model.addAttribute("error", ex.getMessage()); preparerFormulaire(model, session, form, null); model.addAttribute("formAction", "/rh/employes/nouveau"); model.addAttribute("formTitle", "Ajouter un employé"); return "rh/employe-form"; }
     }
 
@@ -94,7 +98,7 @@ public class EmployeController {
     @PostMapping("/{id}/modifier")
     public String enregistrerModification(@PathVariable Long id, EmployeForm form, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
-        try { dossierService.modifier(id, form); redirectAttributes.addFlashAttribute("message", "Dossier mis à jour."); return "redirect:/rh/employes/" + id; }
+        try { Employe avant = employeRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Employé introuvable.")); Employe apres = dossierService.modifier(id, form); auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE, AuditService.EMPLOYE, id, valeursEmploye(avant), valeursEmploye(apres)); redirectAttributes.addFlashAttribute("message", "Dossier mis à jour."); return "redirect:/rh/employes/" + id; }
         catch (RuntimeException ex) { model.addAttribute("error", ex.getMessage()); model.addAttribute("employe", employeRepository.findById(id).orElse(null)); preparerFormulaire(model, session, form, id); model.addAttribute("formAction", "/rh/employes/" + id + "/modifier"); model.addAttribute("formTitle", "Modifier le dossier employé"); return "rh/employe-form"; }
     }
 
@@ -129,10 +133,13 @@ public class EmployeController {
         try {
             Employe employe = employeRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Employé introuvable."));
+            Employe.Statut ancienStatut = employe.getStatut();
             Employe.Statut nouveauStatut = Employe.Statut.valueOf(statut);
             employe.setStatut(nouveauStatut);
             employe.setDateFin(nouveauStatut == Employe.Statut.SORTI ? LocalDate.now() : null);
             employeRepository.save(employe);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE, AuditService.EMPLOYE, id,
+                    AuditService.valeurs("statut", ancienStatut), valeursEmploye(employe));
             redirectAttributes.addFlashAttribute("message", "Statut de l'employé mis à jour.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -161,9 +168,12 @@ public class EmployeController {
                 throw new IllegalArgumentException("La date de fin doit être postérieure à la date de début.");
 
             for (Contrat precedent : contratRepository.findByEmploye_IdAndStatut(id, Contrat.Statut.EN_COURS)) {
+                Contrat.Statut ancienStatut = precedent.getStatut();
                 precedent.setStatut(Contrat.Statut.TERMINE);
                 precedent.setDateFin(debut.minusDays(1));
                 contratRepository.save(precedent);
+                auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE, AuditService.CONTRAT,
+                        precedent.getId(), AuditService.valeurs("statut", ancienStatut), valeursContrat(precedent));
             }
             Contrat contrat = new Contrat();
             contrat.setEmploye(employe);
@@ -175,6 +185,8 @@ public class EmployeController {
             contrat.setDevise("Ar");
             contrat.setStatut(Contrat.Statut.EN_COURS);
             contratRepository.save(contrat);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.INSERT, AuditService.CONTRAT,
+                    contrat.getId(), null, valeursContrat(contrat));
             employe.setStatut(Employe.Statut.ACTIF);
             employe.setDateFin(null);
             employeRepository.save(employe);
@@ -199,10 +211,23 @@ public class EmployeController {
             contrat.setStatut(Contrat.Statut.TERMINE);
             contrat.setDateFin(LocalDate.now());
             contratRepository.save(contrat);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE, AuditService.CONTRAT,
+                    contratId, AuditService.valeurs("statut", Contrat.Statut.EN_COURS), valeursContrat(contrat));
             redirectAttributes.addFlashAttribute("message", "Contrat terminé.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
         return "redirect:/rh/employes/" + employeId;
+    }
+
+    private java.util.Map<String, Object> valeursEmploye(Employe employe) {
+        return AuditService.valeurs("matricule", employe.getMatricule(), "statut", employe.getStatut(),
+                "dateEmbauche", employe.getDateEmbauche(), "dateFin", employe.getDateFin());
+    }
+
+    private java.util.Map<String, Object> valeursContrat(Contrat contrat) {
+        return AuditService.valeurs("typeContrat", contrat.getTypeContrat(), "poste", contrat.getPoste().getIntitule(),
+                "dateDebut", contrat.getDateDebut(), "dateFin", contrat.getDateFin(),
+                "salaireMensuel", contrat.getSalaireMensuel(), "statut", contrat.getStatut());
     }
 }

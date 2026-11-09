@@ -16,6 +16,7 @@ import com.example.logiciel_RH.entity.FichePaie;
 import com.example.logiciel_RH.repository.FichePaieRepository;
 import com.example.logiciel_RH.repository.PaiementSalaireRepository;
 import com.example.logiciel_RH.service.PaieService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,13 +27,16 @@ public class PaieController {
     private final PaieService paieService;
     private final FichePaieRepository ficheRepository;
     private final PaiementSalaireRepository paiementRepository;
+    private final AuditService auditService;
 
     public PaieController(PaieService paieService,
                           FichePaieRepository ficheRepository,
-                          PaiementSalaireRepository paiementRepository) {
+                          PaiementSalaireRepository paiementRepository,
+                          AuditService auditService) {
         this.paieService = paieService;
         this.ficheRepository = ficheRepository;
         this.paiementRepository = paiementRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping
@@ -58,6 +62,8 @@ public class PaieController {
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
         model.addAttribute("fiche", fiche);
         model.addAttribute("paiement", paiementRepository.findByFichePaie_Id(id).orElse(null));
+        auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.CONSULTATION,
+                AuditService.FICHE_PAIE, id, null, null);
         return "rh/paie-detail";
     }
 
@@ -66,7 +72,10 @@ public class PaieController {
                           RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
         try {
-            paieService.valider(id);
+            FichePaie fiche = paieService.valider(id);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.FICHE_PAIE, id, AuditService.valeurs("statut", FichePaie.Statut.BROUILLON),
+                    AuditService.valeurs("statut", fiche.getStatut(), "dateValidation", fiche.getDateValidation()));
             redirectAttributes.addFlashAttribute("message", "Fiche de paie validée.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -79,7 +88,10 @@ public class PaieController {
                         RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
         try {
-            paieService.payer(id);
+            var paiement = paieService.payer(id);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.FICHE_PAIE, id, AuditService.valeurs("statut", FichePaie.Statut.VALIDEE),
+                    AuditService.valeurs("statut", FichePaie.Statut.PAYEE, "referencePaiement", paiement.getReference()));
             redirectAttributes.addFlashAttribute("message",
                     "Paiement enregistré et fiche marquée comme payée.");
         } catch (RuntimeException ex) {
