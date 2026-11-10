@@ -2,6 +2,8 @@ package com.example.logiciel_RH.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,11 +67,7 @@ public class EmployeController {
             }
         }
         model.addAttribute("utilisateurConnecte", SessionUtils.getUtilisateur(session));
-        model.addAttribute("employes", employeRepository.rechercher(q, departementId, statutFiltre));
-        model.addAttribute("departements", departementRepository.findAll());
-        model.addAttribute("q", q);
-        model.addAttribute("departementId", departementId);
-        model.addAttribute("statutFiltre", statut);
+        model.addAttribute("employes", employeRepository.findAllByOrderByDateCreationDesc());
         return "rh/employes";
     }
 

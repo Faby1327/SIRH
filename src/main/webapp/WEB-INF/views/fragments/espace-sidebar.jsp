@@ -9,11 +9,13 @@
         <c:choose>
             <c:when test="${param.role == 'manager'}">
                 <a href="${pageContext.request.contextPath}/manager/accueil" class="lien ${param.active == 'accueil' ? 'actif' : ''}">Tableau de bord</a>
+                <a href="${pageContext.request.contextPath}/gestion-demandes" class="lien ${param.active == 'conges' ? 'actif' : ''}">Congés et absences</a>
                 <a href="${pageContext.request.contextPath}/manager/nouvelle" class="lien ${param.active == 'nouvelle' ? 'actif' : ''}">Nouvelle demande</a>
                 <a href="${pageContext.request.contextPath}/manager/candidats" class="lien ${param.active == 'candidats' ? 'actif' : ''}">Candidats à évaluer</a>
             </c:when>
             <c:when test="${param.role == 'rh'}">
                 <a href="${pageContext.request.contextPath}/rh/accueil" class="lien ${param.active == 'demandes' || param.active == 'accueil' || empty param.active ? 'actif' : ''}">Demandes</a>
+                <a href="${pageContext.request.contextPath}/gestion-demandes" class="lien ${param.active == 'conges' ? 'actif' : ''}">Congés et absences</a>
                 <a href="${pageContext.request.contextPath}/rh/accueil#offres" class="lien ${param.active == 'offres' || param.active == 'candidatures' ? 'actif' : ''}">Offres d'emploi</a>
                 <a href="${pageContext.request.contextPath}/rh/entretiens" class="lien ${param.active == 'entretiens' ? 'actif' : ''}">Entretiens et tests</a>
                 <a href="${pageContext.request.contextPath}/rh/employes" class="lien ${param.active == 'employes' ? 'actif' : ''}">Employés et contrats</a>
@@ -29,6 +31,9 @@
             <c:when test="${param.role == 'finance'}">
                 <a href="${pageContext.request.contextPath}/finance/accueil" class="lien ${param.active == 'budgets' ? '' : 'actif'}">Demandes</a>
                 <a href="${pageContext.request.contextPath}/finance/budgets" class="lien ${param.active == 'budgets' ? 'actif' : ''}">Budgets des départements</a>
+            </c:when>
+            <c:when test="${param.role == 'employe'}">
+                <a href="${pageContext.request.contextPath}/mes-demandes" class="lien ${param.active == 'demandes' ? 'actif' : ''}">Mes demandes</a>
             </c:when>
             <c:otherwise>
                 <a href="${pageContext.request.contextPath}/directeur/accueil" class="lien ${param.active == 'budgets' ? '' : 'actif'}">Demandes</a>
@@ -46,6 +51,7 @@
                         <c:when test="${param.role == 'manager'}">Manager · <c:out value="${utilisateurConnecte.departement.nom}"/></c:when>
                         <c:when test="${param.role == 'rh'}">Ressources humaines</c:when>
                         <c:when test="${param.role == 'finance'}">Service Finance</c:when>
+                        <c:when test="${param.role == 'employe'}">Employé</c:when>
                         <c:otherwise>Direction</c:otherwise>
                     </c:choose>
                 </div>
