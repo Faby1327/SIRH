@@ -1,6 +1,7 @@
 package com.example.logiciel_RH.controller;
 
 import java.time.LocalTime;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -19,12 +20,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.entity.Employe;
+import com.example.logiciel_RH.entity.Absence;
+import com.example.logiciel_RH.repository.AbsenceRepository;
 import com.example.logiciel_RH.entity.DetailJourTravail;
 import com.example.logiciel_RH.repository.DetailJourTravailRepository;
 import com.example.logiciel_RH.repository.EmployeRepository;
+import com.example.logiciel_RH.repository.AffectationHoraireRepository;
 import com.example.logiciel_RH.repository.JourTravailRepository;
 import com.example.logiciel_RH.repository.ParticipationMissionRepository;
 import com.example.logiciel_RH.service.PlanningJourService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -37,17 +42,103 @@ public class EspaceEmployeController {
     private final PlanningJourService planningService;
     private final ParticipationMissionRepository participationRepository;
     private final DetailJourTravailRepository detailRepository;
+    private final AbsenceRepository absenceRepository;
+    private final AffectationHoraireRepository affectationRepository;
+    private final AuditService auditService;
 
     public EspaceEmployeController(EmployeRepository employeRepository,
                                    JourTravailRepository jourRepository,
                                    PlanningJourService planningService,
                                    ParticipationMissionRepository participationRepository,
-                                   DetailJourTravailRepository detailRepository) {
+                                   DetailJourTravailRepository detailRepository,
+                                   AbsenceRepository absenceRepository,
+                                   AffectationHoraireRepository affectationRepository,
+                                   AuditService auditService) {
         this.employeRepository = employeRepository;
         this.jourRepository = jourRepository;
         this.planningService = planningService;
         this.participationRepository = participationRepository;
         this.detailRepository = detailRepository;
+        this.absenceRepository = absenceRepository;
+        this.affectationRepository = affectationRepository;
+        this.auditService = auditService;
+    }
+
+    @GetMapping("/conges")
+    @Transactional(readOnly = true)
+    public String conges(HttpSession session, Model model, RedirectAttributes flash) {
+        if (!SessionUtils.hasRole(session, "EMPLOYE")) return "redirect:/login";
+        Employe employe = employeConnecte(session);
+        if (employe == null) return "redirect:/login";
+        model.addAttribute("employe", employe);
+        var absences = absenceRepository.findByEmploye_IdOrderByDateDebutDesc(employe.getId());
+        model.addAttribute("absences", absences);
+        Map<Long, Integer> joursDemandes = new LinkedHashMap<>();
+        absences.forEach(a -> joursDemandes.put(a.getId(), joursPlanifies(employe, a.getDateDebut(), a.getDateFin())));
+        model.addAttribute("joursDemandes", joursDemandes);
+        model.addAttribute("soldeConge", calculerSoldeConge(employe));
+        int joursEnAttente = joursCongesEnAttente(employe);
+        if (joursEnAttente > calculerSoldeConge(employe)) {
+            model.addAttribute("alerteSolde", "Solde insuffisant : vos demandes en attente représentent "
+                    + joursEnAttente + " jour(s), alors que votre solde disponible est de "
+                    + calculerSoldeConge(employe) + " jour(s).");
+        }
+        model.addAttribute("aujourdHui", java.time.LocalDate.now());
+        return "employe-conges";
+    }
+
+    private int calculerSoldeConge(Employe employe) {
+        int quota = employe.getSoldeConge() == null ? 30 : employe.getSoldeConge();
+        int joursPris = absenceRepository.findByEmploye_IdAndTypeAbsenceAndStatut(employe.getId(),
+                Absence.TypeAbsence.CONGE, Absence.Statut.VALIDEE).stream()
+                .mapToInt(a -> joursPlanifies(employe, a.getDateDebut(), a.getDateFin())).sum();
+        return Math.max(0, quota - joursPris);
+    }
+
+    private int joursPlanifies(Employe employe, LocalDate debut, LocalDate fin) {
+        var affectations = affectationRepository.findByEmploye_IdOrderByDateDebutDesc(employe.getId());
+        int jours = 0;
+        for (LocalDate date = debut; !date.isAfter(fin); date = date.plusDays(1)) {
+            LocalDate jour = date;
+            int jourSemaine = jour.getDayOfWeek().getValue();
+            if (affectations.stream().anyMatch(a -> a.isActif() && !a.getDateDebut().isAfter(jour)
+                    && (a.getDateFin() == null || !a.getDateFin().isBefore(jour))
+                    && a.getJoursSemaine().contains(jourSemaine))) jours++;
+        }
+        return jours;
+    }
+
+    private int joursCongesEnAttente(Employe employe) {
+        return absenceRepository.findByEmploye_IdOrderByDateDebutDesc(employe.getId()).stream()
+                .filter(a -> a.getTypeAbsence() == Absence.TypeAbsence.CONGE
+                        && a.getStatut() == Absence.Statut.DEMANDEE)
+                .mapToInt(a -> joursPlanifies(employe, a.getDateDebut(), a.getDateFin())).sum();
+    }
+
+    @PostMapping("/conges")
+    @Transactional
+    public String demanderConge(@RequestParam String dateDebut, @RequestParam String dateFin,
+                                @RequestParam(required = false) String motif, HttpSession session,
+                                RedirectAttributes flash) {
+        if (!SessionUtils.hasRole(session, "EMPLOYE")) return "redirect:/login";
+        try {
+            Employe employe = employeConnecte(session);
+            if (employe == null) throw new IllegalArgumentException("Dossier employé introuvable.");
+            var debut = java.time.LocalDate.parse(dateDebut); var fin = java.time.LocalDate.parse(dateFin);
+            if (fin.isBefore(debut)) throw new IllegalArgumentException("La date de fin doit être postérieure ou égale à la date de début.");
+            if (debut.isBefore(java.time.LocalDate.now())) throw new IllegalArgumentException("Les dates passées ne peuvent pas être sélectionnées.");
+            if (participationRepository.estAffectePendant(employe.getId(), debut, fin)) throw new IllegalArgumentException("Vous êtes affecté à une mission pendant cette période et ne pouvez pas vous absenter.");
+            if (absenceRepository.aChevauchement(employe.getId(), debut, fin)) throw new IllegalArgumentException("Cette période chevauche déjà une autre absence ou demande.");
+            int joursDemandes = joursPlanifies(employe, debut, fin);
+            int soldeDisponible = Math.max(0, calculerSoldeConge(employe) - joursCongesEnAttente(employe));
+            if (joursDemandes > soldeDisponible) throw new IllegalArgumentException("Solde insuffisant : " + soldeDisponible
+                    + " jour(s) disponible(s), " + joursDemandes + " demandé(s).");
+            Absence a = new Absence(); a.setEmploye(employe); a.setDateDebut(debut); a.setDateFin(fin);
+            a.setTypeAbsence(Absence.TypeAbsence.CONGE); a.setMotif(motif == null || motif.isBlank() ? null : motif.trim());
+            a.setStatut(Absence.Statut.DEMANDEE); a.setDateDemande(java.time.LocalDateTime.now());
+            a = absenceRepository.save(a); auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.INSERT, AuditService.ABSENCE, a.getId(), null, AuditService.valeurs("type", "CONGE", "dateDebut", debut, "dateFin", fin, "joursDemandes", joursDemandes, "statut", "DEMANDEE")); flash.addFlashAttribute("message", "Votre demande de congé a été envoyée aux RH.");
+        } catch (RuntimeException e) { flash.addFlashAttribute("error", "Demande non envoyée : " + e.getMessage()); }
+        return "redirect:/employe/conges";
     }
 
     @GetMapping
@@ -75,7 +166,7 @@ public class EspaceEmployeController {
             int minutes = detailRepository.totalMinutesMission(
                     participation.getId(), DetailJourTravail.TypeDetail.MISSION);
             minutesMission.put(participation.getId(), minutes);
-            dureesMission.put(participation.getId(), formaterDuree(minutes));
+            dureesMission.put(participation.getId(), minutes <= 0 ? "Aucune heure saisie" : formaterDuree(minutes));
         }
         model.addAttribute("participations", participations);
         model.addAttribute("dureesMission", dureesMission);

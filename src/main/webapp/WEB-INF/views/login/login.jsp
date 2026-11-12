@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
@@ -81,6 +81,7 @@
                     <tr><td>Ressources humaines</td><td class="code">hery.rh@sirh.test</td><td class="code">hash_test_3</td></tr>
                     <tr><td>Finance</td><td class="code">fara.finance@sirh.test</td><td class="code">hash_test_4</td></tr>
                     <tr><td>Directeur</td><td class="code">solo.direction@sirh.test</td><td class="code">hash_test_5</td></tr>
+                    <tr><td>Employé</td><td class="code">employe.demo@sirh.test</td><td class="code">hash_test_6</td></tr>
                     <tr><td>Candidat</td><td colspan="2">Créez votre compte avec le lien « S'inscrire ».</td></tr>
                     </tbody>
                 </table>

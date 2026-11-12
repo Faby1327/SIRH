@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.service.HeureSupplementaireService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -17,9 +18,11 @@ import jakarta.servlet.http.HttpSession;
 public class HeureSupplementaireController {
 
     private final HeureSupplementaireService service;
+    private final AuditService auditService;
 
-    public HeureSupplementaireController(HeureSupplementaireService service) {
+    public HeureSupplementaireController(HeureSupplementaireService service, AuditService auditService) {
         this.service = service;
+        this.auditService = auditService;
     }
 
     @GetMapping
@@ -35,7 +38,10 @@ public class HeureSupplementaireController {
                           RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
         try {
-            service.valider(id);
+            var heure = service.valider(id);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.HEURE_SUPPLEMENTAIRE, id, AuditService.valeurs("statut", "DEMANDEE"),
+                    AuditService.valeurs("statut", heure.getStatut(), "dateValidation", heure.getDateValidation()));
             redirectAttributes.addFlashAttribute("message", "Heure supplémentaire validée.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", "Validation impossible : " + ex.getMessage());
@@ -48,7 +54,10 @@ public class HeureSupplementaireController {
                           RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
         try {
-            service.refuser(id);
+            var heure = service.refuser(id);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.HEURE_SUPPLEMENTAIRE, id, AuditService.valeurs("statut", "DEMANDEE"),
+                    AuditService.valeurs("statut", heure.getStatut(), "dateValidation", heure.getDateValidation()));
             redirectAttributes.addFlashAttribute("message", "Heure supplémentaire refusée.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", "Refus impossible : " + ex.getMessage());

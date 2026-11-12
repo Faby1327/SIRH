@@ -89,5 +89,13 @@ body { margin: 0; color: #17263a; background: #f3f6fa; font-family: 'IBM Plex Sa
 .employe-document-row strong { color: #30445f; font-size: 14px; }
 .employe-document-row small { margin-top: 5px; color: #8794a5; font-size: 12px; }
 .employe-muted { color: #8794a5; font-size: 14px; }
+.conges-card { margin-bottom: 18px; }
+.conges-form { align-items: start; }
+.conges-form label { color: #52657e; font-size: 13px; }
+.conges-form label span { font-weight: 700; }
+.conges-form .champ { min-height: 42px; width: 100%; padding: 9px 11px; border: 1px solid #cbd5e3; border-radius: 8px; background: #fff; color: #30445f; font: inherit; }
+.conges-form textarea.champ { min-height: 84px; resize: vertical; }
+.conges-form .detail-submit { align-self: end; }
+.conges-card .employe-card table { min-width: 560px; }
 @media (max-width: 760px) { .employe-profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .employe-profile-grid { grid-template-columns: 1fr; } .employe-document-row { align-items: flex-start; flex-direction: column; } }

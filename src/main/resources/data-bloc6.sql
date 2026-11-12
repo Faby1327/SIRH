@@ -1,4 +1,6 @@
 -- SIRH - data-bloc6.sql
+\set ON_ERROR_STOP on
+-- Pour charger toute la demonstration, lancer setup-demo.sql depuis postgres.
 -- Données de démonstration du bloc 6 : affectations horaires.
 --
 -- À exécuter après schema.sql puis data.sql :
@@ -43,6 +45,7 @@ VALUES
         TRUE
     )
 ON CONFLICT (id) DO NOTHING;
+
 
 INSERT INTO modele_horaire (
     id, nom, heure_debut, heure_fin,
@@ -134,6 +137,8 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
+
+UPDATE employe SET departement_id = 1, poste_id = 1 WHERE id = 1;
 INSERT INTO contrat (
     id, employe_id, proposition_id, poste_id,
     type_contrat, date_debut, salaire_mensuel, devise, statut

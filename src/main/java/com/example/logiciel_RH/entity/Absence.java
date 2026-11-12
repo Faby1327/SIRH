@@ -30,6 +30,10 @@ public class Absence {
     @JoinColumn(name = "employe_id", nullable = false)
     private Employe employe;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "remplacant_id")
+    private Employe remplacant;
+
     @Column(name = "date_debut", nullable = false)
     private LocalDate dateDebut;
 
@@ -63,6 +67,8 @@ public class Absence {
     public void setId(Long id) { this.id = id; }
     public Employe getEmploye() { return employe; }
     public void setEmploye(Employe employe) { this.employe = employe; }
+    public Employe getRemplacant() { return remplacant; }
+    public void setRemplacant(Employe remplacant) { this.remplacant = remplacant; }
     public LocalDate getDateDebut() { return dateDebut; }
     public void setDateDebut(LocalDate dateDebut) { this.dateDebut = dateDebut; }
     public LocalDate getDateFin() { return dateFin; }

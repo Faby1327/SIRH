@@ -944,3 +944,34 @@
 .absence-paie-badge { display: inline-flex; padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .absence-paie-payee { background: #e6f4ea; color: #176b38; }
 .absence-paie-retenue { background: #fff0d5; color: #8a5b00; }
+/* Absence list: keep all seven columns readable and make review actions clear. */
+.c-absences-page .table-offres { min-width: 930px; }
+.c-absences-page .table-offres th:nth-child(1), .c-absences-page .table-offres td:nth-child(1) { width: 18%; }
+.c-absences-page .table-offres th:nth-child(2), .c-absences-page .table-offres td:nth-child(2) { width: 19%; }
+.c-absences-page .table-offres th:nth-child(3), .c-absences-page .table-offres td:nth-child(3) { width: 10%; }
+.c-absences-page .table-offres th:nth-child(4), .c-absences-page .table-offres td:nth-child(4) { width: 16%; }
+.c-absences-page .table-offres th:nth-child(5), .c-absences-page .table-offres td:nth-child(5) { width: 14%; }
+.c-absences-page .table-offres th:nth-child(6), .c-absences-page .table-offres td:nth-child(6) { width: 13%; }
+.c-absences-page .table-offres th:nth-child(7), .c-absences-page .table-offres td:nth-child(7) { width: 10%; text-align: center; }
+.c-absences-page .table-offres td:nth-child(7) { white-space: nowrap; }
+.absence-view-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 68px; min-height: 34px; padding: 0 12px; border: 1px solid #315b9d; border-radius: 8px; background: #315b9d; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; text-decoration: none; white-space: nowrap; transition: background .15s ease, box-shadow .15s ease, transform .15s ease; }
+.absence-view-btn:hover { background: #24477f; box-shadow: 0 3px 9px rgba(36,71,127,.2); transform: translateY(-1px); }
+.c-absences-page .table-offres .puce { align-items: center; justify-content: center; min-width: 88px; padding: 6px 10px; font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+/* Absence request detail actions and feedback */
+.absence-review-form { gap: 18px; padding-top: 24px; }
+.absence-review-form select.champ { min-height: 46px; }
+.absence-review-form label small { margin-top: 2px; color: var(--c-muted); font-size: 12px; font-weight: 400; line-height: 1.5; }
+.absence-review-form .detail-submit button { min-height: 42px; padding: 0 18px; border: 1px solid #315b9d; border-radius: 8px; background: #315b9d; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s ease, transform .15s ease; }
+.absence-review-form .detail-submit button:hover { background: #24477f; transform: translateY(-1px); }
+.absence-refuse-form { display: flex; justify-content: flex-end; padding: 0 24px 24px; }
+.absence-refuse-btn { min-height: 40px; padding: 0 15px; border: 1px solid #e2a8a2; border-radius: 8px; background: #fff7f6; color: #a1342d; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.absence-refuse-btn:hover { border-color: #a1342d; background: #fde9e6; }
+.absence-back-btn { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; margin-bottom: 16px; padding: 0 12px; border: 1px solid var(--c-border); border-radius: 8px; background: #fff; color: var(--c-ink-2); font-size: 13px; font-weight: 600; text-decoration: none; }
+.absence-back-btn:hover { border-color: var(--c-accent); color: var(--c-accent); }
+.absence-detail-summary { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 900px) { .absence-detail-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.absence-review-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 0 24px 24px; }
+.absence-review-actions > .bouton-principal { min-height: 42px; padding: 0 18px; border: 1px solid #315b9d; border-radius: 8px; background: #315b9d; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.absence-review-actions > .bouton-principal:hover { background: #24477f; }
+.absence-review-actions .absence-refuse-form { padding: 0; }
+@media (max-width: 520px) { .absence-review-actions { align-items: stretch; flex-direction: column; } .absence-review-actions > button, .absence-review-actions .absence-refuse-btn { width: 100%; } }

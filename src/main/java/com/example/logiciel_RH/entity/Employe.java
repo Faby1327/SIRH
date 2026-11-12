@@ -98,6 +98,9 @@ public class Employe {
     @Column(name = "salaire_actuel", precision = 14, scale = 2)
     private BigDecimal salaireActuel;
 
+    @Column(name = "solde_conge", nullable = false)
+    private Integer soldeConge = 30;
+
     private String photo;
 
     public Long getId() { return id; }
@@ -150,6 +153,8 @@ public class Employe {
     public void setSuperieur(Employe superieur) { this.superieur = superieur; }
     public BigDecimal getSalaireActuel() { return salaireActuel; }
     public void setSalaireActuel(BigDecimal salaireActuel) { this.salaireActuel = salaireActuel; }
+    public Integer getSoldeConge() { return soldeConge == null ? 30 : soldeConge; }
+    public void setSoldeConge(Integer soldeConge) { this.soldeConge = soldeConge; }
     public String getPhoto() { return photo; }
     public void setPhoto(String photo) { this.photo = photo; }
 }

@@ -1,4 +1,5 @@
 -- SIRH - schema.sql
+\set ON_ERROR_STOP on
 -- Reconstruction complète de la base. Les données sont dans data.sql.
 -- Exécuter avec psql en ciblant une base permettant l'administration,
 -- par exemple : psql -h localhost -U postgres -d postgres -f schema.sql
@@ -105,6 +106,7 @@ CREATE TABLE IF NOT EXISTS employe (
     poste_id INT,
     superieur_id INT,
     salaire_actuel NUMERIC(14,2),
+    solde_conge INT NOT NULL DEFAULT 30,
     photo VARCHAR(255),
 
     CONSTRAINT fk_employe_personne
@@ -701,6 +703,7 @@ CREATE TABLE IF NOT EXISTS anomalie_temps (
 CREATE TABLE IF NOT EXISTS absence (
     id SERIAL PRIMARY KEY,
     employe_id INT NOT NULL,
+    remplacant_id INT,
     date_debut DATE NOT NULL,
     date_fin DATE NOT NULL,
     type_absence VARCHAR(30) NOT NULL,
@@ -711,6 +714,7 @@ CREATE TABLE IF NOT EXISTS absence (
     date_demande TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     date_validation TIMESTAMP,
     CONSTRAINT fk_absence_employe FOREIGN KEY (employe_id) REFERENCES employe(id),
+    CONSTRAINT fk_absence_remplacant FOREIGN KEY (remplacant_id) REFERENCES employe(id),
     CONSTRAINT fk_absence_validateur FOREIGN KEY (valide_par) REFERENCES utilisateur(id),
     CONSTRAINT ck_absence_dates CHECK (date_fin >= date_debut),
     CONSTRAINT ck_absence_type CHECK (type_absence IN ('CONGE', 'MALADIE', 'AUTORISATION', 'ABSENCE_INJUSTIFIEE', 'AUTRE')),
@@ -926,3 +930,22 @@ CREATE INDEX IF NOT EXISTS idx_hist_situation ON historique_situation_personnell
 CREATE INDEX IF NOT EXISTS idx_audit_date ON journal_audit(date_action);
 CREATE INDEX IF NOT EXISTS idx_audit_utilisateur ON journal_audit(utilisateur_id);
 CREATE INDEX IF NOT EXISTS idx_audit_entite ON journal_audit(type_entite_id, entite_id);
+
+ALTER TABLE employe ADD COLUMN IF NOT EXISTS solde_conge INT NOT NULL DEFAULT 30;
+ALTER TABLE absence ADD COLUMN IF NOT EXISTS remplacant_id INT;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_absence_remplacant') THEN
+        ALTER TABLE absence ADD CONSTRAINT fk_absence_remplacant FOREIGN KEY (remplacant_id) REFERENCES employe(id);
+    END IF;
+END $$;
+
+INSERT INTO type_entite (code, libelle) VALUES
+    ('ABSENCE', 'Absence'),
+    ('DEMANDE_RECRUTEMENT', 'Demande de recrutement'),
+    ('JOUR_TRAVAIL', 'Jour de travail'),
+    ('DETAIL_JOUR_TRAVAIL', 'Détail de jour de travail'),
+    ('HEURE_SUPPLEMENTAIRE', 'Heure supplémentaire'),
+    ('PROPOSITION_EMBAUCHE', 'Proposition d’embauche')
+ON CONFLICT (code) DO NOTHING;
+commit;

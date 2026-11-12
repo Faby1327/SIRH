@@ -14,13 +14,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.entity.Employe;
+import com.example.logiciel_RH.entity.Absence;
 import com.example.logiciel_RH.entity.DetailJourTravail;
 import com.example.logiciel_RH.entity.Mission;
 import com.example.logiciel_RH.entity.ParticipationMission;
 import com.example.logiciel_RH.repository.EmployeRepository;
+import com.example.logiciel_RH.repository.AbsenceRepository;
 import com.example.logiciel_RH.repository.DetailJourTravailRepository;
 import com.example.logiciel_RH.repository.MissionRepository;
 import com.example.logiciel_RH.repository.ParticipationMissionRepository;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,15 +35,21 @@ public class MissionController {
     private final ParticipationMissionRepository participationRepository;
     private final EmployeRepository employeRepository;
     private final DetailJourTravailRepository detailRepository;
+    private final AbsenceRepository absenceRepository;
+    private final AuditService auditService;
 
     public MissionController(MissionRepository missionRepository,
                              ParticipationMissionRepository participationRepository,
                              EmployeRepository employeRepository,
-                             DetailJourTravailRepository detailRepository) {
+                             DetailJourTravailRepository detailRepository,
+                             AbsenceRepository absenceRepository,
+                             AuditService auditService) {
         this.missionRepository = missionRepository;
         this.participationRepository = participationRepository;
         this.employeRepository = employeRepository;
         this.detailRepository = detailRepository;
+        this.absenceRepository = absenceRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping
@@ -86,6 +95,10 @@ public class MissionController {
             mission.setResponsable(SessionUtils.getUtilisateur(session));
             mission.setStatut(Mission.Statut.A_FAIRE);
             missionRepository.save(mission);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.INSERT,
+                    AuditService.MISSION, mission.getId(), null,
+                    AuditService.valeurs("titre", mission.getTitre(), "dateDebut", debut,
+                            "dateFinPrevue", fin, "priorite", mission.getPriorite(), "statut", mission.getStatut()));
             redirectAttributes.addFlashAttribute("message", "Mission créée.");
             return "redirect:/rh/missions/" + mission.getId();
         } catch (RuntimeException ex) {
@@ -116,13 +129,19 @@ public class MissionController {
             int minutes = detailRepository.totalMinutesMission(
                     participation.getId(), DetailJourTravail.TypeDetail.MISSION);
             totalMinutes += minutes;
-            dureesParticipation.put(participation.getId(), formaterDuree(minutes));
+            dureesParticipation.put(participation.getId(), dureeAffichee(minutes));
         }
         model.addAttribute("participations", participations);
         model.addAttribute("toutesAffectationsTerminees", toutesAffectationsTerminees);
         model.addAttribute("dureesParticipation", dureesParticipation);
-        model.addAttribute("dureeTotaleMission", formaterDuree(totalMinutes));
-        model.addAttribute("employes", employeRepository.findAllByOrderByDateCreationDesc());
+        model.addAttribute("dureeTotaleMission", dureeAffichee(totalMinutes));
+        LocalDate finMission = mission.getDateFinPrevue() == null ? mission.getDateDebut() : mission.getDateFinPrevue();
+        model.addAttribute("employes", employeRepository.findAllByOrderByDateCreationDesc().stream()
+                .filter(e -> e.getStatut() == Employe.Statut.ACTIF)
+                .filter(e -> !absenceRepository.aChevauchementDeType(e.getId(), mission.getDateDebut(), finMission,
+                        Absence.TypeAbsence.CONGE))
+                .filter(e -> !absenceRepository.estEngageCommeRemplacant(e.getId(), mission.getDateDebut(), finMission))
+                .toList());
         model.addAttribute("participationStatuts", ParticipationMission.Statut.values());
         return "rh/mission-detail";
     }
@@ -136,6 +155,7 @@ public class MissionController {
         try {
             Mission mission = missionRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Mission introuvable."));
+            Mission.Statut ancienStatut = mission.getStatut();
             if (mission.getStatut() == Mission.Statut.TERMINEE) {
                 throw new IllegalArgumentException("Cette mission est déjà terminée.");
             }
@@ -154,6 +174,10 @@ public class MissionController {
             mission.setStatut(Mission.Statut.TERMINEE);
             mission.setDateFinReelle(LocalDate.now());
             missionRepository.save(mission);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.MISSION, mission.getId(),
+                    AuditService.valeurs("statut", ancienStatut),
+                    AuditService.valeurs("statut", "TERMINEE", "dateFinReelle", mission.getDateFinReelle()));
             redirectAttributes.addFlashAttribute("message", "Mission terminée.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -178,15 +202,29 @@ public class MissionController {
             }
             Employe employe = employeRepository.findById(employeId)
                     .orElseThrow(() -> new IllegalArgumentException("Employé introuvable."));
+            LocalDate affectationDate = LocalDate.parse(dateAffectation);
+            LocalDate finMission = mission.getDateFinPrevue() == null ? mission.getDateDebut() : mission.getDateFinPrevue();
+            if (employe.getStatut() != Employe.Statut.ACTIF)
+                throw new IllegalArgumentException("Seul un employé actif peut être affecté à une mission.");
+            if (absenceRepository.aChevauchementDeType(employeId, mission.getDateDebut(), finMission,
+                    Absence.TypeAbsence.CONGE))
+                throw new IllegalArgumentException("Cet employé est en congé pendant la période de la mission.");
+            if (absenceRepository.estEngageCommeRemplacant(employeId, mission.getDateDebut(), finMission))
+                throw new IllegalArgumentException("Cet employé est déjà engagé comme remplaçant pendant la période de la mission.");
             if (roleMission == null || roleMission.isBlank()) throw new IllegalArgumentException("Le rôle est obligatoire.");
             ParticipationMission participation = new ParticipationMission();
             participation.setMission(mission);
             participation.setEmploye(employe);
             participation.setRoleMission(roleMission.trim());
-            participation.setDateAffectation(LocalDate.parse(dateAffectation));
+            participation.setDateAffectation(affectationDate);
             participation.setAvancement(0);
             participation.setStatut(ParticipationMission.Statut.AFFECTEE);
             participationRepository.save(participation);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.MISSION, mission.getId(), null,
+                    AuditService.valeurs("participantAjoute", employe.getPersonne().getNomComplet(),
+                            "employeId", employeId, "roleMission", roleMission.trim(),
+                            "dateAffectation", affectationDate));
             redirectAttributes.addFlashAttribute("message", "Employé affecté à la mission.");
         } catch (DataIntegrityViolationException ex) {
             redirectAttributes.addFlashAttribute("error", "Cet employé participe déjà à cette mission.");
@@ -206,10 +244,15 @@ public class MissionController {
         try {
             Mission mission = missionRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Mission introuvable."));
+            Mission.Statut ancienStatut = mission.getStatut();
             Mission.Statut nouveau = Mission.Statut.valueOf(statut);
             mission.setStatut(nouveau);
             mission.setDateFinReelle(nouveau == Mission.Statut.TERMINEE ? LocalDate.now() : null);
             missionRepository.save(mission);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.MISSION, mission.getId(),
+                    AuditService.valeurs("statut", ancienStatut),
+                    AuditService.valeurs("statut", nouveau, "dateFinReelle", mission.getDateFinReelle()));
             redirectAttributes.addFlashAttribute("message", "Statut de la mission mis à jour.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", "Statut non modifié : " + ex.getMessage());
@@ -219,5 +262,9 @@ public class MissionController {
 
     private String formaterDuree(int minutes) {
         return (minutes / 60) + " h " + String.format(java.util.Locale.ROOT, "%02d", minutes % 60);
+    }
+
+    private String dureeAffichee(int minutes) {
+        return minutes <= 0 ? "Aucune heure saisie" : formaterDuree(minutes);
     }
 }

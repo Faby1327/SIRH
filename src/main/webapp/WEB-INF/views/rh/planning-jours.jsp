@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <!DOCTYPE html>
@@ -13,7 +13,7 @@
 <c:if test="${not empty message}"><div class="dossier-alert dossier-alert-ok"><c:out value="${message}"/></div></c:if>
 <c:if test="${not empty error}"><div class="dossier-alert dossier-alert-error"><c:out value="${error}"/></div></c:if>
 <section class="carte c-table planning-card"><div class="dossier-card-heading"><div><span class="dossier-icon dossier-icon-blue">01</span><div><h2>Suivi du mois</h2><p><c:out value="${jours.size()}"/> journée(s) planifiée(s)</p></div></div></div>
-<div class="filtres"><div class="recherche"><input type="search" class="champ champ-recherche" placeholder="Rechercher par employé ou matricule…" data-table-search></div><div class="filtre"><label for="jour-statut">Statut</label><select id="jour-statut" class="champ" data-table-filter="statut"><option value="">Tous les statuts</option><option value="PLANIFIEE">Planifiée</option><option value="POINTAGE_A_VERIFIER">Pointage à vérifier</option><option value="POINTAGE_VALIDE">Pointage validé</option><option value="DETAIL_A_VERIFIER">Détails à vérifier</option><option value="VALIDEE">Journée validée</option></select></div></div>
+<div class="filtres"><div class="recherche"><input type="search" class="champ champ-recherche" placeholder="Rechercher par employé ou matricule…" data-table-search></div><div class="filtre"><label for="jour-statut">Statut</label><select id="jour-statut" class="champ" data-table-filter="statut"><option value="">Tous les statuts</option><option value="PLANIFIEE">Planifiée</option><option value="POINTAGE_A_VERIFIER">Pointage à vérifier</option><option value="POINTAGE_VALIDE">Pointage validé</option><option value="DETAIL_A_VERIFIER">Détails à vérifier</option><option value="ABSENCE">Absence</option><option value="VALIDEE">Journée validée</option></select></div></div>
 <div class="defilement"><table class="table-offres planning-table"><thead><tr><th>Date</th><th>Employé</th><th>Prévu</th><th>Réel</th><th>Résultat</th><th>Statut</th><th>Action</th></tr></thead><tbody>
 <c:choose><c:when test="${empty jours}"><tr><td colspan="7" class="dossier-empty">Aucune journée planifiée pour cette période.</td></tr></c:when><c:otherwise><c:forEach var="jour" items="${jours}">
 <tr data-table-row data-search="${jour.employe.personne.nomComplet} ${jour.employe.matricule}" data-statut="${jour.statut}">

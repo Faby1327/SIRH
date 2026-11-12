@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="statutAvancement" value="${demande.statutActuel.libelle}"/>
 <div class="c-stepbar c-stepbar-detail" aria-label="Avancement de la demande">

@@ -12,6 +12,13 @@ public interface EmployeRepository extends JpaRepository<Employe, Long> {
 
     java.util.List<Employe> findAllByOrderByDateCreationDesc();
 
+    @Query("select distinct e from Employe e join fetch e.personne left join e.departement d left join e.poste p "
+         + "where e.statut = com.example.logiciel_RH.entity.Employe.Statut.ACTIF and e.id <> :employeId and "
+         + "(d.idDepartement = :departementId or p.departement.idDepartement = :departementId or "
+         + "exists (select c.id from Contrat c where c.employe = e and c.statut = com.example.logiciel_RH.entity.Contrat.Statut.EN_COURS and c.poste.departement.idDepartement = :departementId)) "
+         + "order by e.personne.nom")
+    java.util.List<Employe> remplaçantsDuDépartement(@Param("departementId") Long departementId, @Param("employeId") Long employeId);
+
     @Query("select e from Employe e join fetch e.personne p "
          + "left join fetch e.departement d "
          + "where (:q is null or :q = '' or "

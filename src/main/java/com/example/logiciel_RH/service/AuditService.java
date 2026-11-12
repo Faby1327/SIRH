@@ -28,6 +28,13 @@ public class AuditService {
     public static final String EMPLOYE = "EMPLOYE";
     public static final String CONTRAT = "CONTRAT";
     public static final String FICHE_PAIE = "FICHE_PAIE";
+    public static final String ABSENCE = "ABSENCE";
+    public static final String DEMANDE_RECRUTEMENT = "DEMANDE_RECRUTEMENT";
+    public static final String JOUR_TRAVAIL = "JOUR_TRAVAIL";
+    public static final String DETAIL_JOUR_TRAVAIL = "DETAIL_JOUR_TRAVAIL";
+    public static final String HEURE_SUPPLEMENTAIRE = "HEURE_SUPPLEMENTAIRE";
+    public static final String PROPOSITION_EMBAUCHE = "PROPOSITION_EMBAUCHE";
+    public static final String MISSION = "MISSION";
 
     private final JournalAuditRepository journalRepository;
     private final TypeActionRepository actionRepository;

@@ -19,6 +19,7 @@ import com.example.logiciel_RH.entity.DemandeRecrutement;
 import com.example.logiciel_RH.entity.Utilisateur;
 import com.example.logiciel_RH.repository.DepartementRepository;
 import com.example.logiciel_RH.service.DemandeRecrutementService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -28,10 +29,13 @@ public class DirecteurController {
 
     private final DemandeRecrutementService demandeService;
     private final DepartementRepository departementRepository;
+    private final AuditService auditService;
 
-    public DirecteurController(DemandeRecrutementService demandeService, DepartementRepository departementRepository) {
+    public DirecteurController(DemandeRecrutementService demandeService, DepartementRepository departementRepository,
+                              AuditService auditService) {
         this.demandeService = demandeService;
         this.departementRepository = departementRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping("/accueil")
@@ -102,7 +106,10 @@ public class DirecteurController {
         }
 
         Utilisateur directeur = SessionUtils.getUtilisateur(session);
+        String ancienStatut = demande.get().getStatutActuel() == null ? null : demande.get().getStatutActuel().getLibelle();
         demandeService.changerStatut(demande.get(), "VALIDEE", directeur, "Validation Direction");
+        auditService.enregistrer(directeur, AuditService.UPDATE, AuditService.DEMANDE_RECRUTEMENT, idDemande,
+                AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "VALIDEE", "decision", "APPROBATION_DIRECTION"));
         redirectAttributes.addFlashAttribute("message", "Demande approuvee.");
 
         return "redirect:/directeur/accueil";
@@ -124,7 +131,10 @@ public class DirecteurController {
         }
 
         Utilisateur directeur = SessionUtils.getUtilisateur(session);
+        String ancienStatut = demande.get().getStatutActuel() == null ? null : demande.get().getStatutActuel().getLibelle();
         demandeService.changerStatut(demande.get(), "REFUSEE", directeur, remarque);
+        auditService.enregistrer(directeur, AuditService.UPDATE, AuditService.DEMANDE_RECRUTEMENT, idDemande,
+                AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "REFUSEE", "decision", "REFUS_DIRECTION", "motif", remarque));
         redirectAttributes.addFlashAttribute("message", "Demande refusee.");
 
         return "redirect:/directeur/accueil";

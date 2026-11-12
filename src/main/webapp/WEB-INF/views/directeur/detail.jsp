@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Détail Direction</title><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/besoins.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/composants.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/decision.css"><link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/directeur.css"></head><body>

@@ -143,7 +143,10 @@ public class RhController {
         }
 
         Utilisateur rh = SessionUtils.getUtilisateur(session);
+        String ancienStatut = demande.get().getStatutActuel() == null ? null : demande.get().getStatutActuel().getLibelle();
         demandeService.changerStatut(demande.get(), "EN_VERIFICATION_FINANCIERE", rh, "Validation RH");
+        auditService.enregistrer(rh, AuditService.UPDATE, AuditService.DEMANDE_RECRUTEMENT, idDemande,
+                AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "EN_VERIFICATION_FINANCIERE", "decision", "VALIDATION_RH"));
         redirectAttributes.addFlashAttribute("message", "Demande validee et transmise a la Finance.");
 
         return "redirect:/rh/accueil";
@@ -165,7 +168,10 @@ public class RhController {
         }
 
         Utilisateur rh = SessionUtils.getUtilisateur(session);
+        String ancienStatut = demande.get().getStatutActuel() == null ? null : demande.get().getStatutActuel().getLibelle();
         demandeService.changerStatut(demande.get(), "REFUSEE", rh, remarque);
+        auditService.enregistrer(rh, AuditService.UPDATE, AuditService.DEMANDE_RECRUTEMENT, idDemande,
+                AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "REFUSEE", "decision", "REFUS_RH", "motif", remarque));
         redirectAttributes.addFlashAttribute("message", "Demande refusee.");
 
         return "redirect:/rh/accueil";
@@ -597,8 +603,15 @@ public class RhController {
             return "redirect:/login";
         }
         try {
+            PropositionEmbauche propositionAvant = propositionEmbaucheService.propositionPourOffre(idOffre, propositionId)
+                    .orElseThrow(() -> new IllegalArgumentException("Proposition introuvable."));
+            String ancienStatut = propositionAvant.getStatut();
             propositionEmbaucheService.confirmerEmbauche(
                     propositionId, SessionUtils.getUtilisateur(session).getIdUtilisateur(), commentaireRh);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.PROPOSITION_EMBAUCHE, propositionId,
+                    AuditService.valeurs("statut", ancienStatut),
+                    AuditService.valeurs("statut", PropositionEmbauche.STATUT_CONFIRMEE, "offreId", idOffre));
             redirectAttributes.addFlashAttribute("message", "Embauche confirmée. Complétez maintenant la création de l'employé et du contrat.");
             return "redirect:/rh/offre/" + idOffre + "/embauches/" + propositionId + "/creation";
         } catch (RuntimeException ex) {
@@ -646,6 +659,11 @@ public class RhController {
             }
             Contrat contrat = propositionEmbaucheService.creerEmployeEtContrat(
                     propositionId, SessionUtils.getUtilisateur(session));
+            Employe employe = contrat.getEmploye();
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.INSERT, AuditService.EMPLOYE,
+                    employe.getId(), null, AuditService.valeurs("matricule", employe.getMatricule(), "statut", employe.getStatut()));
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.INSERT, AuditService.CONTRAT,
+                    contrat.getId(), null, AuditService.valeurs("employeId", employe.getId(), "typeContrat", contrat.getTypeContrat(), "statut", contrat.getStatut()));
             redirectAttributes.addFlashAttribute("message",
                     "Employé créé et contrat " + contrat.getTypeContrat() + " activé avec succès.");
         } catch (IllegalArgumentException ex) {

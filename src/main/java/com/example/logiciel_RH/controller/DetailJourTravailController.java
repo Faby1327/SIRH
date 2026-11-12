@@ -21,6 +21,7 @@ import com.example.logiciel_RH.repository.DetailJourTravailRepository;
 import com.example.logiciel_RH.repository.JourTravailRepository;
 import com.example.logiciel_RH.repository.ParticipationMissionRepository;
 import com.example.logiciel_RH.service.DetailJourTravailService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,18 +33,21 @@ public class DetailJourTravailController {
     private final EmployeRepository employeRepository;
     private final ParticipationMissionRepository participationRepository;
     private final DetailJourTravailRepository detailRepository;
+    private final AuditService auditService;
     private final DetailJourTravailService detailService;
 
     public DetailJourTravailController(JourTravailRepository jourRepository,
                                        EmployeRepository employeRepository,
                                        ParticipationMissionRepository participationRepository,
                                        DetailJourTravailService detailService,
-                                       DetailJourTravailRepository detailRepository) {
+                                       DetailJourTravailRepository detailRepository,
+                                       AuditService auditService) {
         this.jourRepository = jourRepository;
         this.employeRepository = employeRepository;
         this.participationRepository = participationRepository;
         this.detailService = detailService;
         this.detailRepository = detailRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping("/{id}/details")
@@ -120,7 +124,12 @@ public class DetailJourTravailController {
         try {
             DetailJourTravail detail = detailRepository.findById(detailId)
                     .orElseThrow(() -> new IllegalArgumentException("Détail introuvable."));
-            detailService.changerStatut(detailId, DetailJourTravail.Statut.valueOf(statut));
+            DetailJourTravail.Statut ancienStatut = detail.getStatut();
+            DetailJourTravail.Statut nouveauStatut = DetailJourTravail.Statut.valueOf(statut);
+            detailService.changerStatut(detailId, nouveauStatut);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE,
+                    AuditService.DETAIL_JOUR_TRAVAIL, detailId, AuditService.valeurs("statut", ancienStatut),
+                    AuditService.valeurs("statut", nouveauStatut));
             redirectAttributes.addFlashAttribute("message", "Statut du détail mis à jour.");
             return "redirect:/planning/jours/rh/" + detail.getJourTravail().getId() + "/details";
         } catch (RuntimeException ex) {

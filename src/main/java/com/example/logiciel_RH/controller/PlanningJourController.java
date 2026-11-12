@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.logiciel_RH.service.PlanningJourService;
+import com.example.logiciel_RH.service.AuditService;
+import com.example.logiciel_RH.repository.JourTravailRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -25,9 +27,14 @@ import jakarta.servlet.http.HttpSession;
 public class PlanningJourController {
 
     private final PlanningJourService planningService;
+    private final JourTravailRepository jourRepository;
+    private final AuditService auditService;
 
-    public PlanningJourController(PlanningJourService planningService) {
+    public PlanningJourController(PlanningJourService planningService, JourTravailRepository jourRepository,
+                                  AuditService auditService) {
         this.planningService = planningService;
+        this.jourRepository = jourRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping("/jours")
@@ -70,7 +77,11 @@ public class PlanningJourController {
                           RedirectAttributes redirectAttributes) {
         if (!SessionUtils.hasRole(session, "RH")) return "redirect:/login";
         try {
+            var jour = jourRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Journée introuvable."));
+            String ancienStatut = jour.getStatut();
             planningService.validerJournee(id);
+            auditService.enregistrer(SessionUtils.getUtilisateur(session), AuditService.UPDATE, AuditService.JOUR_TRAVAIL,
+                    id, AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "POINTAGE_VALIDE"));
             redirectAttributes.addFlashAttribute("message", "Journée validée par les RH.");
         } catch (RuntimeException ex) {
             redirectAttributes.addFlashAttribute("error", "Validation impossible : " + ex.getMessage());

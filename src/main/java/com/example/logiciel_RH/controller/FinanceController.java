@@ -20,6 +20,7 @@ import com.example.logiciel_RH.entity.DemandeRecrutement;
 import com.example.logiciel_RH.entity.Utilisateur;
 import com.example.logiciel_RH.repository.DepartementRepository;
 import com.example.logiciel_RH.service.DemandeRecrutementService;
+import com.example.logiciel_RH.service.AuditService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -29,10 +30,13 @@ public class FinanceController {
 
     private final DemandeRecrutementService demandeService;
     private final DepartementRepository departementRepository;
+    private final AuditService auditService;
 
-    public FinanceController(DemandeRecrutementService demandeService, DepartementRepository departementRepository) {
+    public FinanceController(DemandeRecrutementService demandeService, DepartementRepository departementRepository,
+                             AuditService auditService) {
         this.demandeService = demandeService;
         this.departementRepository = departementRepository;
+        this.auditService = auditService;
     }
 
     @GetMapping("/accueil")
@@ -131,7 +135,10 @@ public class FinanceController {
         }
 
         Utilisateur finance = SessionUtils.getUtilisateur(session);
+        String ancienStatut = valeur.getStatutActuel() == null ? null : valeur.getStatutActuel().getLibelle();
         demandeService.changerStatut(valeur, "EN_ATTENTE_VALIDATION", finance, "Validation Finance");
+        auditService.enregistrer(finance, AuditService.UPDATE, AuditService.DEMANDE_RECRUTEMENT, idDemande,
+                AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "EN_ATTENTE_VALIDATION", "decision", "VALIDATION_FINANCE"));
         redirectAttributes.addFlashAttribute("message", "Budget valide, demande transmise a la Direction.");
 
         return "redirect:/finance/accueil";
@@ -164,7 +171,10 @@ public class FinanceController {
         }
 
         Utilisateur finance = SessionUtils.getUtilisateur(session);
+        String ancienStatut = valeur.getStatutActuel() == null ? null : valeur.getStatutActuel().getLibelle();
         demandeService.changerStatut(valeur, "BUDGET_INSUFFISANT", finance, commentaire);
+        auditService.enregistrer(finance, AuditService.UPDATE, AuditService.DEMANDE_RECRUTEMENT, idDemande,
+                AuditService.valeurs("statut", ancienStatut), AuditService.valeurs("statut", "BUDGET_INSUFFISANT", "decision", "REFUS_FINANCE", "motif", commentaire));
         redirectAttributes.addFlashAttribute("message", "Demande refusee par la Finance.");
 
         return "redirect:/finance/accueil";
